@@ -1,0 +1,657 @@
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script>
+    let db = null;
+    
+    if (typeof firebase === 'undefined') {
+        console.error('Firebase SDK no cargado.');
+        alert('Error: Firebase SDK no cargado.');
+    } else {
+        const firebaseConfig = {
+            apiKey: "AIzaSyDLQvc4QbYLbIWLERg8LC_QZlGpEd5mtK0",
+            authDomain: "sonya-c88bc.firebaseapp.com",
+            databaseURL: "https://sonya-c88bc-default-rtdb.firebaseio.com",
+            projectId: "sonya-c88bc",
+            storageBucket: "sonya-c88bc.appspot.com",
+            messagingSenderId: "1078869575645",
+            appId: "1:1078869575645:web:222a93490168335da91834",
+            measurementId: "G-2FM9KJ8MN9"
+        };
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+            console.log('Firebase inicializado correctamente');
+        } catch (error) {
+            console.error('Error inicializando Firebase:', error);
+            alert('Error inicializando Firebase.');
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const productsGrid = document.getElementById('products-grid');
+        const loginButton = document.getElementById('login-button');
+        const logoutButton = document.getElementById('logout-button');
+        const loginModal = document.getElementById('login-modal');
+        const editProductModal = document.getElementById('edit-product-modal');
+        const newProductModal = document.getElementById('new-product-modal');
+        const cartCountElement = document.querySelector('.cart-count');
+        const addNewProductButton = document.getElementById('add-new-product');
+        const categoriesList = document.getElementById('categories-list');
+        const addCategoryButton = document.getElementById('add-category');
+    
+        let isAdmin = false;
+        let currentEditProduct = null;
+        let activeCategory = 'Ver Todo';
+        const defaultImage = 'logo.png'; // Fallback image URL
+    
+        function normalizeCategory(category) {
+            return category ? category.trim().toLowerCase().replace('×', '') : '';
+        }
+    
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+    
+        async function checkAdminCredentials(email, password) {
+            if (!db) {
+                console.error('Base de datos no disponible');
+                return false;
+            }
+            try {
+                const snapshot = await db.ref('admin').once('value');
+                const adminData = snapshot.val();
+                if (!adminData) return false;
+                return adminData.gmail === email && adminData.contraseña === password;
+            } catch (error) {
+                console.error('Error verificando credenciales:', error);
+                return false;
+            }
+        }
+    
+        function checkAuth() {
+            isAdmin = localStorage.getItem('isAdmin') === 'true';
+            loginButton.style.display = isAdmin ? 'none' : 'block';
+            logoutButton.style.display = isAdmin ? 'block' : 'none';
+            addNewProductButton.style.display = isAdmin ? 'block' : 'none';
+            addCategoryButton.style.display = isAdmin ? 'block' : 'none';
+            loadCategories();
+            loadProducts();
+        }
+    
+        async function loadCategories() {
+            if (!db) {
+                console.error('Base de datos no inicializada');
+                showNotification('Error: Base de datos no disponible', 'error');
+                return;
+            }
+    
+            try {
+                console.log('Intentando cargar categorías...');
+                const snapshot = await db.ref('categories').once('value');
+                console.log('Snapshot recibido:', snapshot.val());
+    
+                categoriesList.innerHTML = `
+                    <a href="#" class="category-item ${activeCategory === 'Ver Todo' ? 'category-active' : 'category-inactive'}" data-category="Ver Todo">Ver Todo</a>
+                    <button class="add-category" id="add-category" style="display: ${isAdmin ? 'block' : 'none'};">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+                        Añadir categoría
+                    </button>
+                `;
+                const newAddCategoryButton = document.getElementById('add-category');
+                newAddCategoryButton.addEventListener('click', addCategory);
+    
+                if (snapshot.exists()) {
+                    const categories = snapshot.val();
+                    console.log('Categorías encontradas:', categories);
+    
+                    Object.entries(categories).forEach(([categoryId, category]) => {
+                        const cleanCategoryName = category.name.replace('×', '');
+                        const categoryElement = document.createElement('a');
+                        categoryElement.href = '#';
+                        categoryElement.className = `category-item ${activeCategory === cleanCategoryName ? 'category-active' : 'category-inactive'}`;
+                        categoryElement.textContent = cleanCategoryName;
+                        categoryElement.dataset.category = cleanCategoryName;
+                        categoryElement.dataset.id = categoryId;
+    
+                        if (isAdmin) {
+                            const deleteButton = document.createElement('button');
+                            deleteButton.className = 'delete-category';
+                            deleteButton.innerHTML = '×';
+                            deleteButton.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                deleteCategory(categoryId);
+                            });
+                            categoryElement.appendChild(deleteButton);
+                        }
+    
+                        categoryElement.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            setActiveCategory(cleanCategoryName);
+                        });
+    
+                        categoriesList.insertBefore(categoryElement, newAddCategoryButton);
+                    });
+                } else {
+                    console.log('No se encontraron categorías, creando categoría predeterminada "Caballeros"');
+                    const newCategoryRef = db.ref('categories').push();
+                    await newCategoryRef.set({ name: 'Caballeros' });
+    
+                    const defaultCategory = document.createElement('a');
+                    defaultCategory.href = '#';
+                    defaultCategory.className = `category-item ${activeCategory === 'Caballeros' ? 'category-active' : 'category-inactive'}`;
+                    defaultCategory.textContent = 'Caballeros';
+                    defaultCategory.dataset.category = 'Caballeros';
+                    defaultCategory.dataset.id = newCategoryRef.key;
+    
+                    defaultCategory.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        setActiveCategory('Caballeros');
+                    });
+    
+                    categoriesList.insertBefore(defaultCategory, newAddCategoryButton);
+                }
+    
+                const verTodoElement = categoriesList.querySelector('[data-category="Ver Todo"]');
+                verTodoElement.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    setActiveCategory('Ver Todo');
+                });
+    
+                updateCategorySelects();
+                console.log('Categorías cargadas exitosamente');
+            } catch (error) {
+                console.error('Error detallado al cargar categorías:', {
+                    message: error.message,
+                    code: error.code,
+                    stack: error.stack
+                });
+                showNotification('Error al cargar categorías: ' + error.message, 'error');
+            }
+        }
+    
+        function setActiveCategory(category) {
+            console.log('Setting active category:', category);
+            activeCategory = category;
+            const categoryItems = categoriesList.querySelectorAll('.category-item');
+            categoryItems.forEach(item => {
+                item.className = `category-item ${item.dataset.category === category ? 'category-active' : 'category-inactive'}`;
+            });
+            loadProducts();
+        }
+    
+        async function addCategory() {
+            if (!isAdmin) {
+                showNotification('Debes ser administrador para añadir categorías', 'error');
+                return;
+            }
+    
+            const categoryName = prompt('Ingrese el nombre de la nueva categoría:');
+            if (!categoryName || !categoryName.trim()) {
+                showNotification('El nombre de la categoría no puede estar vacío', 'error');
+                return;
+            }
+    
+            const trimmedName = categoryName.trim();
+            if (trimmedName.toLowerCase() === 'ver todo') {
+                showNotification('El nombre "Ver Todo" está reservado', 'error');
+                return;
+            }
+    
+            try {
+                const snapshot = await db.ref('categories').once('value');
+                if (snapshot.exists()) {
+                    const categories = snapshot.val();
+                    const categoryExists = Object.values(categories).some(category => 
+                        normalizeCategory(category.name) === normalizeCategory(trimmedName)
+                    );
+                    if (categoryExists) {
+                        showNotification('La categoría ya existe', 'error');
+                        return;
+                    }
+                }
+    
+                console.log('Añadiendo categoría:', trimmedName);
+                const newCategoryRef = db.ref('categories').push();
+                await newCategoryRef.set({ name: trimmedName });
+                showNotification('Categoría añadida exitosamente');
+                loadCategories();
+            } catch (error) {
+                console.error('Error detallado al añadir categoría:', {
+                    message: error.message,
+                    code: error.code,
+                    stack: error.stack
+                });
+                let errorMessage = 'Error al añadir categoría';
+                if (error.code === 'PERMISSION_DENIED') {
+                    errorMessage = 'Permiso denegado: Inicia sesión como administrador';
+                }
+                showNotification(errorMessage, 'error');
+            }
+        }
+    
+        async function deleteCategory(categoryId) {
+            if (!isAdmin) {
+                showNotification('Debes ser administrador para eliminar categorías', 'error');
+                return;
+            }
+    
+            if (confirm('¿Está seguro de que desea eliminar esta categoría?')) {
+                try {
+                    const categoryElement = categoriesList.querySelector(`[data-id="${categoryId}"]`);
+                    const categoryName = categoryElement ? categoryElement.dataset.category : null;
+    
+                    if (!categoryName) {
+                        showNotification('No se encontró la categoría', 'error');
+                        return;
+                    }
+    
+                    const productsSnapshot = await db.ref('products').once('value');
+                    let hasProducts = false;
+                    if (productsSnapshot.exists()) {
+                        const products = productsSnapshot.val();
+                        hasProducts = Object.values(products).some(product => 
+                            normalizeCategory(product.category) === normalizeCategory(categoryName)
+                        );
+                    }
+    
+                    if (hasProducts) {
+                        showNotification('No se puede eliminar la categoría porque tiene productos asociados', 'error');
+                        return;
+                    }
+    
+                    console.log('Eliminando categoría:', categoryName, 'ID:', categoryId);
+                    await db.ref('categories/' + categoryId).remove();
+                    showNotification('Categoría eliminada exitosamente');
+    
+                    if (activeCategory === categoryName) {
+                        setActiveCategory('Ver Todo');
+                    } else {
+                        loadCategories();
+                    }
+                } catch (error) {
+                    console.error('Error detallado al eliminar categoría:', {
+                        message: error.message,
+                        code: error.code,
+                        stack: error.stack
+                    });
+                    let errorMessage = 'Error al eliminar categoría';
+                    if (error.code === 'PERMISSION_DENIED') {
+                        errorMessage = 'Permiso denegado: Inicia sesión como administrador';
+                    }
+                    showNotification(errorMessage, 'error');
+                }
+            }
+        }
+    
+        function updateCategorySelects() {
+            const editSelect = document.getElementById('edit-category');
+            const newSelect = document.getElementById('new-category');
+            editSelect.innerHTML = '<option value="" disabled selected>Seleccione una categoría</option>';
+            newSelect.innerHTML = '<option value="" disabled selected>Seleccione una categoría</option>';
+    
+            const categories = categoriesList.querySelectorAll('.category-item:not([data-category="Ver Todo"])');
+            categories.forEach(category => {
+                const cleanCategoryName = category.dataset.category;
+                const option1 = document.createElement('option');
+                const option2 = document.createElement('option');
+                option1.value = cleanCategoryName;
+                option2.value = cleanCategoryName;
+                option1.textContent = cleanCategoryName;
+                option2.textContent = cleanCategoryName;
+                editSelect.appendChild(option1);
+                newSelect.appendChild(option2);
+            });
+            console.log('Category selects updated:', Array.from(editSelect.options).map(opt => opt.value));
+        }
+    
+        function createProductCard(product, productId) {
+            console.log('Creating product card:', product.name, 'Category:', product.category, 'ID:', productId);
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.dataset.category = product.category || '';
+    
+            const imageUrl = product.image || defaultImage;
+            const hasSizes = product.sizes && Object.keys(product.sizes).length > 0;
+            let sizesHTML = '';
+            let stockInfo = '';
+    
+            if (hasSizes) {
+                sizesHTML = '<div class="product-sizes"><select class="size-selector">';
+                sizesHTML += '<option value="">Seleccionar talla</option>';
+                Object.entries(product.sizes).forEach(([size, stock]) => {
+                    const isAvailable = stock > 0;
+                    sizesHTML += `<option value="${size}" ${!isAvailable ? 'disabled' : ''}>${size} ${!isAvailable ? '(Agotado)' : `(${stock} disponibles)`}</option>`;
+                });
+                sizesHTML += '</select></div>';
+                const totalStock = Object.values(product.sizes).reduce((sum, current) => sum + current, 0);
+                stockInfo = `<p class="stock-info">Stock: ${totalStock}</p>`;
+            } else {
+                const stockAmount = product.stock || 0;
+                stockInfo = `<p class="stock-info">Stock: ${stockAmount}</p>`;
+            }
+    
+            card.innerHTML = `
+                <div class="product-image">
+                    <img src="${imageUrl}" alt="${product.name}" onerror="this.src='${defaultImage}'">
+                </div>
+                <div class="product-info">
+                    <h2 class="product-name">${product.name}</h2>
+                    ${sizesHTML}
+                    ${stockInfo}
+                    <div class="product-footer">
+                        <p class="product-price">$${product.price.toFixed(2)}</p>
+                        <button class="add-to-cart" data-id="${productId}">Agregar</button>
+                        ${isAdmin ? `<button class="edit-product" data-id="${productId}">Editar</button>` : ''}
+                    </div>
+                </div>
+            `;
+    
+            const addToCartBtn = card.querySelector('.add-to-cart');
+            addToCartBtn.addEventListener('click', () => {
+                let selectedSize = '';
+                let canAdd = true;
+    
+                if (hasSizes) {
+                    const sizeSelector = card.querySelector('.size-selector');
+                    selectedSize = sizeSelector.value;
+    
+                    if (!selectedSize) {
+                        showNotification('Por favor selecciona una talla', 'error');
+                        canAdd = false;
+                    }
+    
+                    if (canAdd && product.sizes[selectedSize] <= 0) {
+                        showNotification('Producto agotado en esta talla', 'error');
+                        canAdd = false;
+                    }
+                } else {
+                    if (product.stock <= 0) {
+                        showNotification('Producto agotado', 'error');
+                        canAdd = false;
+                    }
+                }
+    
+                if (canAdd) {
+                    const cart = JSON.parse(localStorage.getItem('cart') || '{}');
+                    const productKey = selectedSize ? `${productId}_${selectedSize}` : productId;
+    
+                    cart[productKey] = {
+                        id: productId,
+                        name: product.name,
+                        price: product.price,
+                        image: imageUrl,
+                        size: selectedSize,
+                        quantity: 1
+                    };
+    
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartCount();
+                    showNotification('Producto agregado al carrito');
+                }
+            });
+    
+            if (isAdmin && card.querySelector('.edit-product')) {
+                card.querySelector('.edit-product').addEventListener('click', () => {
+                    currentEditProduct = { id: productId, ...product };
+                    document.getElementById('edit-name').value = product.name;
+                    document.getElementById('edit-price').value = product.price;
+                    document.getElementById('edit-image').value = product.image || '';
+                    document.getElementById('edit-category').value = product.category ? product.category.replace('×', '') : '';
+                    const sizesContainer = document.getElementById('edit-sizes-container');
+                    sizesContainer.innerHTML = '';
+                    if (product.sizes && Object.keys(product.sizes).length > 0) {
+                        Object.entries(product.sizes).forEach(([size, stock]) => {
+                            addSizeField(sizesContainer, size, stock);
+                        });
+                    } else {
+                        addSizeField(sizesContainer);
+                    }
+                    document.getElementById('edit-stock').value = product.stock || 0;
+                    editProductModal.style.display = 'block';
+                    console.log('Editing product:', product.name, 'Category:', product.category);
+                });
+            }
+    
+            return card;
+        }
+    
+        function addSizeField(container, size = '', stock = 0) {
+            const sizeRow = document.createElement('div');
+            sizeRow.className = 'size-row';
+            sizeRow.innerHTML = `
+                <input type="text" class="size-input" placeholder="Talla" value="${size}">
+                <input type="number" class="stock-input" placeholder="Stock" min="0" value="${stock}">
+                <button type="button" class="remove-size">×</button>
+            `;
+            sizeRow.querySelector('.remove-size').addEventListener('click', () => {
+                sizeRow.remove();
+            });
+            container.appendChild(sizeRow);
+        }
+    
+        async function loadProducts() {
+            if (!db) {
+                console.error('Base de datos no inicializada');
+                showNotification('Error: Base de datos no disponible', 'error');
+                return;
+            }
+    
+            try {
+                console.log('Loading products for category:', activeCategory);
+                const snapshot = await db.ref('products').once('value');
+                productsGrid.innerHTML = '';
+                if (snapshot.exists()) {
+                    const products = snapshot.val();
+                    let productCount = 0;
+                    Object.entries(products).forEach(([productId, product]) => {
+                        const productCategory = normalizeCategory(product.category);
+                        const activeCat = normalizeCategory(activeCategory);
+                        console.log(`Product: ${product.name}, Category: ${productCategory}, Active: ${activeCat}`);
+                        if (activeCat === normalizeCategory('Ver Todo') || productCategory === activeCat) {
+                            productsGrid.appendChild(createProductCard(product, productId));
+                            productCount++;
+                        }
+                    });
+                    console.log(`Loaded ${productCount} products for category: ${activeCategory}`);
+                    if (productCount === 0) {
+                        productsGrid.innerHTML = '<p>No hay productos en esta categoría.</p>';
+                    }
+                } else {
+                    productsGrid.innerHTML = '<p>No hay productos disponibles.</p>';
+                }
+            } catch (error) {
+                console.error('Error cargando productos:', error);
+                showNotification('Error al cargar productos', 'error');
+            }
+        }
+    
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '{}');
+            cartCountElement.textContent = Object.keys(cart).length;
+        }
+    
+        loginButton.addEventListener('click', () => loginModal.style.display = 'block');
+    
+        document.getElementById('submit-login').addEventListener('click', async () => {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+    
+            if (!email || !password) {
+                showNotification('Completa todos los campos', 'error');
+                return;
+            }
+    
+            const isValid = await checkAdminCredentials(email, password);
+            if (isValid) {
+                isAdmin = true;
+                localStorage.setItem('isAdmin', 'true');
+                loginModal.style.display = 'none';
+                loginButton.style.display = 'none';
+                logoutButton.style.display = 'block';
+                addNewProductButton.style.display = 'block';
+                addCategoryButton.style.display = 'block';
+                showNotification('Inicio de sesión exitoso');
+                loadCategories();
+                loadProducts();
+            } else {
+                showNotification('Credenciales incorrectas', 'error');
+            }
+        });
+    
+        logoutButton.addEventListener('click', () => {
+            isAdmin = false;
+            localStorage.removeItem('isAdmin');
+            loginButton.style.display = 'block';
+            logoutButton.style.display = 'none';
+            addNewProductButton.style.display = 'none';
+            addCategoryButton.style.display = 'none';
+            showNotification('Sesión cerrada');
+            loadCategories();
+            loadProducts();
+        });
+    
+        function getSizesFromForm(formId) {
+            const sizesContainer = document.getElementById(`${formId}-sizes-container`);
+            const sizeRows = sizesContainer.querySelectorAll('.size-row');
+            const sizes = {};
+    
+            sizeRows.forEach(row => {
+                const sizeInput = row.querySelector('.size-input');
+                const stockInput = row.querySelector('.stock-input');
+    
+                const size = sizeInput.value.trim();
+                const stock = parseInt(stockInput.value) || 0;
+    
+                if (size) {
+                    sizes[size] = stock;
+                }
+            });
+    
+            return sizes;
+        }
+    
+        document.getElementById('save-product').addEventListener('click', async () => {
+            if (!currentEditProduct) return;
+    
+            const updatedProduct = {
+                name: document.getElementById('edit-name').value.trim(),
+                price: parseFloat(document.getElementById('edit-price').value),
+                image: document.getElementById('edit-image').value.trim(),
+                category: document.getElementById('edit-category').value.trim(),
+                stock: parseInt(document.getElementById('edit-stock').value) || 0
+            };
+    
+            if (!updatedProduct.name || isNaN(updatedProduct.price) || !updatedProduct.category) {
+                showNotification('Nombre, precio y categoría son obligatorios', 'error');
+                return;
+            }
+    
+            const sizes = getSizesFromForm('edit');
+            if (Object.keys(sizes).length > 0) {
+                updatedProduct.sizes = sizes;
+            } else {
+                delete updatedProduct.sizes;
+            }
+    
+            try {
+                console.log('Updating product:', currentEditProduct.id, 'New category:', updatedProduct.category);
+                await db.ref('products/' + currentEditProduct.id).update(updatedProduct);
+                const snapshot = await db.ref('products/' + currentEditProduct.id).once('value');
+                const savedProduct = snapshot.val();
+                console.log('Saved product category:', savedProduct.category);
+                editProductModal.style.display = 'none';
+                showNotification('Producto actualizado');
+                setActiveCategory(updatedProduct.category);
+            } catch (error) {
+                console.error('Error actualizando producto:', error);
+                showNotification('Error al actualizar producto', 'error');
+            }
+        });
+    
+        document.getElementById('cancel-edit').addEventListener('click', () => {
+            editProductModal.style.display = 'none';
+        });
+    
+        document.getElementById('add-size-button').addEventListener('click', () => {
+            const sizesContainer = document.getElementById('edit-sizes-container');
+            addSizeField(sizesContainer);
+        });
+    
+        if (addNewProductButton) {
+            addNewProductButton.addEventListener('click', () => {
+                document.getElementById('new-name').value = '';
+                document.getElementById('new-price').value = '';
+                document.getElementById('new-image').value = '';
+                document.getElementById('new-category').value = '';
+                document.getElementById('new-stock').value = '0';
+                const sizesContainer = document.getElementById('new-sizes-container');
+                sizesContainer.innerHTML = '';
+                addSizeField(sizesContainer);
+                newProductModal.style.display = 'block';
+            });
+        }
+    
+        document.getElementById('add-new-size-button').addEventListener('click', () => {
+            const sizesContainer = document.getElementById('new-sizes-container');
+            addSizeField(sizesContainer);
+        });
+    
+        document.getElementById('create-product').addEventListener('click', async () => {
+            const newProduct = {
+                name: document.getElementById('new-name').value.trim(),
+                price: parseFloat(document.getElementById('new-price').value),
+                image: document.getElementById('new-image').value.trim(),
+                category: document.getElementById('new-category').value.trim(),
+                stock: parseInt(document.getElementById('new-stock').value) || 0,
+                createdAt: firebase.database.ServerValue.TIMESTAMP
+            };
+    
+            if (!newProduct.name || isNaN(newProduct.price) || !newProduct.category) {
+                showNotification('Nombre, precio y categoría son obligatorios', 'error');
+                return;
+            }
+    
+            const sizes = getSizesFromForm('new');
+            if (Object.keys(sizes).length > 0) {
+                newProduct.sizes = sizes;
+            }
+    
+            try {
+                const newProductKey = db.ref().child('products').push().key;
+                await db.ref('products/' + newProductKey).set(newProduct);
+                const snapshot = await db.ref('products/' + newProductKey).once('value');
+                const savedProduct = snapshot.val();
+                console.log('Saved new product category:', savedProduct.category);
+                newProductModal.style.display = 'none';
+                showNotification('Producto creado exitosamente');
+                setActiveCategory(newProduct.category);
+            } catch (error) {
+                console.error('Error creando producto:', error);
+                showNotification('Error al crear producto', 'error');
+            }
+        });
+    
+        document.getElementById('cancel-new').addEventListener('click', () => {
+            newProductModal.style.display = 'none';
+        });
+    
+        window.addEventListener('click', (event) => {
+            if (event.target === loginModal) {
+                loginModal.style.display = 'none';
+            }
+            if (event.target === editProductModal) {
+                editProductModal.style.display = 'none';
+            }
+            if (event.target === newProductModal) {
+                newProductModal.style.display = 'none';
+            }
+        });
+    
+        checkAuth();
+        updateCartCount();
+    });
+    </script>

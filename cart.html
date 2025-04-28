@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonya Store - Carrito</title>
+    <meta name="description" content="Carrito de compras de Sonya Store.">
+    <style>
+        /* Mantén los estilos originales, no requieren cambios */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f9fafb;
+            color: #111827;
+            line-height: 1.5;
+        }
+        a { text-decoration: none; color: inherit; }
+        button { cursor: pointer; font-family: inherit; }
+        img { max-width: 100%; height: auto; }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        header {
+            background: #fff;
+            border-bottom: 1px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 3.5rem;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .back-button {
+            display: flex;
+            align-items: center;
+            font-size: 0.875rem;
+            border: 1px solid #00a680;
+            color: #00a680;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            background: none;
+        }
+        .cart-button {
+            position: relative;
+            padding: 0.5rem;
+            background: #befcdf;
+            border: none;
+            border-radius: 0.375rem;
+        }
+        .cart-count {
+            position: absolute;
+            top: -0.25rem;
+            right: -0.25rem;
+            background: #d82c2cc7;
+            color: #000000;
+            font-size: 0.75rem;
+            font-weight: 700;
+            height: 1rem;
+            width: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        .cart-section {
+            padding: 1rem 0;
+        }
+        .cart-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            overflow: hidden;
+        }
+        .cart-table th,
+        .cart-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .cart-table th {
+            font-weight: 600;
+            background: #f3f4f6;
+        }
+        .cart-table select,
+        .cart-table input[type="number"] {
+            padding: 0.25rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            background: #fff;
+            font-size: 0.875rem;
+            width: 100%;
+        }
+        .cart-table input[type="number"] {
+            width: 4rem;
+        }
+        .cart-table .remove-button {
+            padding: 0.25rem 0.5rem;
+            border: 1px solid #d82c2cc7;
+            color: #d82c2cc7;
+            border-radius: 0.375rem;
+            background: none;
+            font-size: 0.875rem;
+        }
+        .cart-table .product-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .cart-table .product-image {
+            width: 3rem;
+            height: 3rem;
+        }
+        .cart-table .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .cart-total {
+            margin-top: 1rem;
+            font-size: 1rem;
+            font-weight: 700;
+            text-align: right;
+        }
+        .checkout-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+            border: none;
+            background: #00a680;
+            color: #fff;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            margin-top: 1rem;
+            width: 100%;
+        }
+        @media (min-width: 768px) {
+            .checkout-button { width: auto; }
+        }
+        .empty-cart {
+            text-align: center;
+            font-size: 1rem;
+            color: #4b5563;
+            padding: 2rem 0;
+        }
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 16px;
+            border-radius: 4px;
+            color: white;
+            z-index: 1000;
+            font-size: 0.875rem;
+        }
+        .notification.success { background-color: #00a680; }
+        .notification.error { background-color: #d82c2cc7; }
+        footer {
+            border-top: 1px solid #e5e7eb;
+            padding: 1rem 0;
+        }
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        @media (min-width: 768px) {
+            .footer-content {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+        .security-badge {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        @media (min-width: 768px) {
+            .security-badge { margin-bottom: 0; }
+        }
+        .security-badge svg {
+            color: #00a680;
+            margin-right: 0.25rem;
+        }
+        .security-text {
+            font-size: 0.875rem;
+        }
+        .created-with {
+            display: flex;
+            align-items: center;
+        }
+        .created-text {
+            font-size: 0.875rem;
+            margin-right: 0.25rem;
+        }
+        .creator-logo {
+            display: flex;
+            align-items: center;
+        }
+        .creator-logo-img img {
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-right: 0.25rem;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .creator-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="header-actions">
+                    <a href="index.html" class="back-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+                        Volver
+                    </a>
+                </div>
+                <div class="header-actions">
+                    <button class="cart-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#00a680"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>
+                        <span class="cart-count">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="container">
+        <div class="cart-section">
+            <h1 class="cart-title">Carrito de Compras</h1>
+            <table class="cart-table" id="cart-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Talla</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="cart-items"></tbody>
+            </table>
+            <p class="empty-cart" id="empty-cart">El carrito está vacío.</p>
+            <div class="cart-total" id="cart-total">Total: $0.00</div>
+            <button class="checkout-button" id="checkout-button">Proceder al Pago</button>
+        </div>
+    </main>
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="security-badge">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    <p class="security-text">Compra 100% segura</p>
+                </div>
+              
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDLQvc4QbYLbIWLERg8LC_QZlGpEd5mtK0",
+            authDomain: "sonya-c88bc.firebaseapp.com",
+            databaseURL: "https://sonya-c88bc-default-rtdb.firebaseio.com",
+            projectId: "sonya-c88bc",
+            storageBucket: "sonya-c88bc.appspot.com",
+            messagingSenderId: "1078869575645",
+            appId: "1:1078869575645:web:222a93490168335da91834",
+            measurementId: "G-2FM9KJ8MN9"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const cartItemsContainer = document.getElementById('cart-items');
+            const emptyCartMessage = document.getElementById('empty-cart');
+            const cartTable = document.getElementById('cart-table');
+            const cartTotalElement = document.getElementById('cart-total');
+            const cartCountElement = document.querySelector('.cart-count');
+            const checkoutButton = document.getElementById('checkout-button');
+
+            function showNotification(message, type = 'success') {
+                const notification = document.createElement('div');
+                notification.textContent = message;
+                notification.className = `notification ${type}`;
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            }
+
+            function getCart() {
+                try {
+                    const cart = JSON.parse(localStorage.getItem('cart') || '{}');
+                    return cart;
+                } catch (error) {
+                    console.error('Error al leer el carrito:', error);
+                    return {};
+                }
+            }
+
+            function saveCart(cart) {
+                try {
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartCount();
+                } catch (error) {
+                    showNotification('Error al guardar el carrito', 'error');
+                }
+            }
+
+            async function getProductData(productId) {
+                try {
+                    const snapshot = await db.ref(`products/${productId}`).once('value');
+                    return snapshot.val();
+                } catch (error) {
+                    console.error('Error al obtener datos del producto:', error);
+                    return null;
+                }
+            }
+
+            async function renderCart() {
+                const cart = getCart();
+                const cartItems = Object.entries(cart);
+                cartItemsContainer.innerHTML = '';
+                let total = 0;
+                let itemCount = 0;
+
+                if (cartItems.length === 0) {
+                    emptyCartMessage.style.display = 'block';
+                    cartTable.style.display = 'none';
+                    checkoutButton.style.display = 'none';
+                    cartTotalElement.textContent = 'Total: $0.00';
+                    cartCountElement.textContent = '0';
+                    return;
+                }
+
+                emptyCartMessage.style.display = 'none';
+                cartTable.style.display = 'table';
+                checkoutButton.style.display = 'block';
+
+                for (const [key, item] of cartItems) {
+                    const productData = await getProductData(item.id);
+                    if (!productData) {
+                        delete cart[key];
+                        saveCart(cart);
+                        continue;
+                    }
+
+                    const hasSizes = productData.sizes && Object.keys(productData.sizes).length > 0;
+                    let sizeOptions = '';
+                    if (hasSizes) {
+                        sizeOptions = Object.keys(productData.sizes)
+                            .map(size => `<option value="${size}" ${size === item.size ? 'selected' : ''} ${productData.sizes[size] <= 0 ? 'disabled' : ''}>${size} (${productData.sizes[size]} disponibles)</option>`)
+                            .join('');
+                    }
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="product-cell">
+                            <div class="product-image"><img src="${item.image || 'https://via.placeholder.com/150'}" alt="${item.name}"></div>
+                            <span>${item.name}</span>
+                        </td>
+                        <td>$${parseFloat(item.price).toFixed(2)}</td>
+                        <td><input type="number" class="quantity-input" data-key="${key}" value="${item.quantity}" min="1"></td>
+                        <td>${hasSizes ? `<select class="size-select" data-key="${key}">${sizeOptions}</select>` : item.size || 'N/A'}</td>
+                        <td><button class="remove-button" data-key="${key}">Eliminar</button></td>
+                    `;
+                    cartItemsContainer.appendChild(row);
+                    total += parseFloat(item.price) * item.quantity;
+                    itemCount++;
+                }
+
+                cartTotalElement.textContent = `Total: $${total.toFixed(2)}`;
+                cartCountElement.textContent = itemCount;
+
+                // Evento para cambiar talla
+                document.querySelectorAll('.size-select').forEach(select => {
+                    select.addEventListener('change', async (e) => {
+                        const key = e.target.dataset.key;
+                        const newSize = e.target.value;
+                        const cart = getCart();
+                        const item = cart[key];
+                        const productData = await getProductData(item.id);
+
+                        if (productData.sizes[newSize] <= 0) {
+                            showNotification('Talla no disponible', 'error');
+                            e.target.value = item.size;
+                            return;
+                        }
+
+                        const newKey = `${item.id}_${newSize}`;
+                        if (newKey !== key && cart[newKey]) {
+                            showNotification('Este producto con esta talla ya está en el carrito', 'error');
+                            e.target.value = item.size;
+                            return;
+                        }
+
+                        cart[newKey] = { ...item, size: newSize };
+                        delete cart[key];
+                        saveCart(cart);
+                        renderCart();
+                        showNotification('Talla actualizada', 'success');
+                    });
+                });
+
+                // Evento para cambiar cantidad
+                document.querySelectorAll('.quantity-input').forEach(input => {
+                    input.addEventListener('change', async (e) => {
+                        const key = e.target.dataset.key;
+                        const quantity = Math.max(1, parseInt(e.target.value) || 1);
+                        e.target.value = quantity;
+                        const cart = getCart();
+                        const item = cart[key];
+                        const productData = await getProductData(item.id);
+
+                        let maxQuantity = item.size && productData.sizes ? productData.sizes[item.size] : productData.stock;
+                        if (quantity > maxQuantity) {
+                            showNotification(`No hay suficiente stock (máximo: ${maxQuantity})`, 'error');
+                            e.target.value = item.quantity;
+                            return;
+                        }
+
+                        cart[key].quantity = quantity;
+                        saveCart(cart);
+                        renderCart();
+                        showNotification('Cantidad actualizada', 'success');
+                    });
+                });
+
+                // Evento para eliminar producto
+                document.querySelectorAll('.remove-button').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const key = e.target.dataset.key;
+                        const cart = getCart();
+                        delete cart[key];
+                        saveCart(cart);
+                        renderCart();
+                        showNotification('Producto eliminado del carrito', 'success');
+                    });
+                });
+            }
+
+            function updateCartCount() {
+                const cart = getCart();
+                cartCountElement.textContent = Object.keys(cart).length;
+            }
+
+            checkoutButton.addEventListener('click', () => {
+                showNotification('Procediendo al pago (funcionalidad no implementada)', 'success');
+            });
+
+            renderCart();
+        });
+    </script>
+</body>
+</html>
