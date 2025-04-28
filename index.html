@@ -300,6 +300,15 @@
             height: 2.5rem;
             margin-bottom: 0.25rem;
         }
+        .product-description {
+            font-size: 0.75rem;
+            color: #6b7280;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 0.25rem;
+        }
         .product-footer {
             display: flex;
             align-items: center;
@@ -400,7 +409,7 @@
             margin: 10% auto;
             padding: 1rem;
             width: 90%;
-            max-width: 500px;
+            max-width: 600px;
             border-radius: 0.375rem;
             position: relative;
         }
@@ -421,6 +430,15 @@
             border-radius: 0.375rem;
             font-size: 0.875rem;
         }
+        .modal-content textarea {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            resize: vertical;
+        }
         .modal-content button {
             padding: 0.5rem 1rem;
             border: none;
@@ -435,6 +453,10 @@
         .modal-content .cancel {
             background: #d1d5db;
             color: #111827;
+        }
+        .modal-content .delete {
+            background: #d82c2cc7;
+            color: #fff;
         }
         .size-row {
             display: flex;
@@ -497,17 +519,45 @@
         .product-sizes {
             margin: 0.5rem 0;
         }
-        .size-selector {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
+        .size-item {
+            display: inline-flex;
+            align-items: center;
+            margin: 0.25rem;
         }
-        .stock-info {
-            margin: 0.25rem 0;
+        .size-checkbox {
+            display: none;
+        }
+        .size-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            border: 1px solid rgb(0, 0, 0);
+            border-color: #000000;
+            border-radius: 50%;
+            background: #ffffff;
+            color: #000000;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+            line-height: 2rem;
+        }
+        .size-checkbox:checked + .size-label {
+            background: #00ff15;
+            color: #242424;
+        }
+        .size-checkbox:disabled + .size-label {
+            background: #6b6b6b;
+            color: #000000;
+            cursor: not-allowed;
+        }
+        .size-stock {
             font-size: 0.75rem;
             color: #6b7280;
+            margin-left: 0.5rem;
         }
         .secondary-button {
             background: #f3f4f6;
@@ -552,6 +602,34 @@
             display: none;
             border-radius: 0.375rem;
         }
+        .add-to-cart-modal {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .add-to-cart-image {
+            flex: 1;
+            min-width: 150px;
+            max-width: 200px;
+        }
+        .add-to-cart-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 0.375rem;
+            object-fit: contain;
+        }
+        .add-to-cart-details {
+            flex: 2;
+            min-width: 200px;
+        }
+        @media (max-width: 480px) {
+            .add-to-cart-modal {
+                flex-direction: column;
+            }
+            .add-to-cart-image {
+                max-width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -593,7 +671,7 @@
                     <p>Av. 6ta, Guayaquil, Ecuador</p>
                 </div>
                 <div class="store-meta">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                     <p>593 979899584</p>
                 </div>
                 <div class="store-meta">
@@ -670,6 +748,10 @@
                 <input type="text" id="edit-name" required aria-label="Nombre del producto">
             </div>
             <div class="form-group">
+                <label for="edit-description">Descripción:</label>
+                <textarea id="edit-description" rows="4" aria-label="Descripción del producto"></textarea>
+            </div>
+            <div class="form-group">
                 <label for="edit-price">Precio:</label>
                 <input type="number" id="edit-price" step="0.01" required aria-label="Precio del producto">
             </div>
@@ -700,6 +782,7 @@
             </div>
             <div class="form-actions">
                 <button class="save" id="save-product" aria-label="Guardar producto">Guardar</button>
+                <button class="delete" id="delete-product" aria-label="Eliminar producto">Eliminar</button>
                 <button class="cancel" id="cancel-edit" aria-label="Cancelar">Cancelar</button>
             </div>
         </div>
@@ -710,6 +793,10 @@
             <div class="form-group">
                 <label for="new-name">Nombre:</label>
                 <input type="text" id="new-name" required aria-label="Nombre del nuevo producto">
+            </div>
+            <div class="form-group">
+                <label for="new-description">Descripción:</label>
+                <textarea id="new-description" rows="4" aria-label="Descripción del nuevo producto"></textarea>
             </div>
             <div class="form-group">
                 <label for="new-price">Precio:</label>
@@ -746,12 +833,34 @@
             </div>
         </div>
     </div>
+    <div class="modal" id="add-to-cart-modal">
+        <div class="modal-content add-to-cart-modal">
+            <div class="add-to-cart-image">
+                <img id="add-to-cart-image" src="" alt="Producto" style="display: none;">
+            </div>
+            <div class="add-to-cart-details">
+                <h2 id="add-to-cart-title">Añadir al Carrito</h2>
+                <div class="form-group">
+                    <label>Descripción:</label>
+                    <p id="add-to-cart-description" style="font-size: 0.875rem; color: #4b5563;"></p>
+                </div>
+                <div class="form-group" id="size-selection-group" style="display: none;">
+                    <label>Seleccionar Tallas:</label>
+                    <div id="add-to-cart-sizes"></div>
+                </div>
+                <div class="form-actions">
+                    <button class="save" id="confirm-add-to-cart" aria-label="Añadir al carrito">Añadir</button>
+                    <button class="cancel" id="cancel-add-to-cart" aria-label="Cancelar">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
     <script>
         let db = null;
-        
+
         if (typeof firebase === 'undefined') {
             console.error('Firebase SDK no cargado.');
             alert('Error: Firebase SDK no cargado.');
@@ -775,7 +884,7 @@
                 alert('Error inicializando Firebase.');
             }
         }
-        
+
         document.addEventListener('DOMContentLoaded', function() {
             const productsGrid = document.getElementById('products-grid');
             const loginButton = document.getElementById('login-button');
@@ -783,6 +892,7 @@
             const loginModal = document.getElementById('login-modal');
             const editProductModal = document.getElementById('edit-product-modal');
             const newProductModal = document.getElementById('new-product-modal');
+            const addToCartModal = document.getElementById('add-to-cart-modal');
             const cartCountElement = document.querySelector('.cart-count');
             const addNewProductButton = document.getElementById('add-new-product');
             const categoriesList = document.getElementById('categories-list');
@@ -791,16 +901,17 @@
             const editImagePreview = document.getElementById('edit-image-preview');
             const newImageFileInput = document.getElementById('new-image-file');
             const newImagePreview = document.getElementById('new-image-preview');
-        
+
             let isAdmin = false;
             let currentEditProduct = null;
+            let currentAddToCartProduct = null;
             let activeCategory = 'Ver Todo';
             const defaultImage = 'logo.png';
-        
+
             function normalizeCategory(category) {
                 return category ? category.trim().toLowerCase().replace('×', '') : '';
             }
-        
+
             function showNotification(message, type = 'success') {
                 const notification = document.createElement('div');
                 notification.className = `notification ${type}`;
@@ -808,7 +919,7 @@
                 document.body.appendChild(notification);
                 setTimeout(() => notification.remove(), 3000);
             }
-        
+
             function getBase64(file) {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
@@ -817,7 +928,7 @@
                     reader.onerror = error => reject(error);
                 });
             }
-        
+
             async function checkAdminCredentials(email, password) {
                 if (!db) {
                     console.error('Base de datos no disponible');
@@ -833,7 +944,26 @@
                     return false;
                 }
             }
-        
+
+            function cleanCart(deletedProductId) {
+                const cart = JSON.parse(localStorage.getItem('cart') || '{}');
+                let wasInCart = false;
+                Object.keys(cart).forEach(key => {
+                    if (cart[key].id === deletedProductId) {
+                        delete cart[key];
+                        wasInCart = true;
+                    }
+                });
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
+                return wasInCart;
+            }
+
+            function updateCartCount() {
+                const cart = JSON.parse(localStorage.getItem('cart') || '{}');
+                cartCountElement.textContent = Object.keys(cart).length;
+            }
+
             function checkAuth() {
                 isAdmin = localStorage.getItem('isAdmin') === 'true';
                 loginButton.style.display = isAdmin ? 'none' : 'block';
@@ -843,19 +973,19 @@
                 loadCategories();
                 loadProducts();
             }
-        
+
             async function loadCategories() {
                 if (!db) {
                     console.error('Base de datos no inicializada');
                     showNotification('Error: Base de datos no disponible', 'error');
                     return;
                 }
-        
+
                 try {
                     console.log('Intentando cargar categorías...');
                     const snapshot = await db.ref('categories').once('value');
                     console.log('Snapshot recibido:', snapshot.val());
-        
+
                     categoriesList.innerHTML = `
                         <a href="#" class="category-item ${activeCategory === 'Ver Todo' ? 'category-active' : 'category-inactive'}" data-category="Ver Todo">Ver Todo</a>
                         <button class="add-category" id="add-category" style="display: ${isAdmin ? 'block' : 'none'};">
@@ -865,11 +995,11 @@
                     `;
                     const newAddCategoryButton = document.getElementById('add-category');
                     newAddCategoryButton.addEventListener('click', addCategory);
-        
+
                     if (snapshot.exists()) {
                         const categories = snapshot.val();
                         console.log('Categorías encontradas:', categories);
-        
+
                         Object.entries(categories).forEach(([categoryId, category]) => {
                             const cleanCategoryName = category.name.replace('×', '');
                             const categoryElement = document.createElement('a');
@@ -878,7 +1008,7 @@
                             categoryElement.textContent = cleanCategoryName;
                             categoryElement.dataset.category = cleanCategoryName;
                             categoryElement.dataset.id = categoryId;
-        
+
                             if (isAdmin) {
                                 const deleteButton = document.createElement('button');
                                 deleteButton.className = 'delete-category';
@@ -889,40 +1019,40 @@
                                 });
                                 categoryElement.appendChild(deleteButton);
                             }
-        
+
                             categoryElement.addEventListener('click', (e) => {
                                 e.preventDefault();
                                 setActiveCategory(cleanCategoryName);
                             });
-        
+
                             categoriesList.insertBefore(categoryElement, newAddCategoryButton);
                         });
                     } else {
                         console.log('No se encontraron categorías, creando categoría predeterminada "Caballeros"');
                         const newCategoryRef = db.ref('categories').push();
                         await newCategoryRef.set({ name: 'Caballeros' });
-        
+
                         const defaultCategory = document.createElement('a');
                         defaultCategory.href = '#';
                         defaultCategory.className = `category-item ${activeCategory === 'Caballeros' ? 'category-active' : 'category-inactive'}`;
                         defaultCategory.textContent = 'Caballeros';
                         defaultCategory.dataset.category = 'Caballeros';
                         defaultCategory.dataset.id = newCategoryRef.key;
-        
+
                         defaultCategory.addEventListener('click', (e) => {
                             e.preventDefault();
                             setActiveCategory('Caballeros');
                         });
-        
+
                         categoriesList.insertBefore(defaultCategory, newAddCategoryButton);
                     }
-        
+
                     const verTodoElement = categoriesList.querySelector('[data-category="Ver Todo"]');
                     verTodoElement.addEventListener('click', (e) => {
                         e.preventDefault();
                         setActiveCategory('Ver Todo');
                     });
-        
+
                     updateCategorySelects();
                     console.log('Categorías cargadas exitosamente');
                 } catch (error) {
@@ -934,7 +1064,7 @@
                     showNotification('Error al cargar categorías: ' + error.message, 'error');
                 }
             }
-        
+
             function setActiveCategory(category) {
                 console.log('Setting active category:', category);
                 activeCategory = category;
@@ -944,25 +1074,25 @@
                 });
                 loadProducts();
             }
-        
+
             async function addCategory() {
                 if (!isAdmin) {
                     showNotification('Debes ser administrador para añadir categorías', 'error');
                     return;
                 }
-        
+
                 const categoryName = prompt('Ingrese el nombre de la nueva categoría:');
                 if (!categoryName || !categoryName.trim()) {
                     showNotification('El nombre de la categoría no puede estar vacío', 'error');
                     return;
                 }
-        
+
                 const trimmedName = categoryName.trim();
                 if (trimmedName.toLowerCase() === 'ver todo') {
                     showNotification('El nombre "Ver Todo" está reservado', 'error');
                     return;
                 }
-        
+
                 try {
                     const snapshot = await db.ref('categories').once('value');
                     if (snapshot.exists()) {
@@ -975,7 +1105,7 @@
                             return;
                         }
                     }
-        
+
                     console.log('Añadiendo categoría:', trimmedName);
                     const newCategoryRef = db.ref('categories').push();
                     await newCategoryRef.set({ name: trimmedName });
@@ -994,23 +1124,23 @@
                     showNotification(errorMessage, 'error');
                 }
             }
-        
+
             async function deleteCategory(categoryId) {
                 if (!isAdmin) {
                     showNotification('Debes ser administrador para eliminar categorías', 'error');
                     return;
                 }
-        
+
                 if (confirm('¿Está seguro de que desea eliminar esta categoría?')) {
                     try {
                         const categoryElement = categoriesList.querySelector(`[data-id="${categoryId}"]`);
                         const categoryName = categoryElement ? categoryElement.dataset.category : null;
-        
+
                         if (!categoryName) {
                             showNotification('No se encontró la categoría', 'error');
                             return;
                         }
-        
+
                         const productsSnapshot = await db.ref('products').once('value');
                         let hasProducts = false;
                         if (productsSnapshot.exists()) {
@@ -1019,16 +1149,16 @@
                                 normalizeCategory(product.category) === normalizeCategory(categoryName)
                             );
                         }
-        
+
                         if (hasProducts) {
                             showNotification('No se puede eliminar la categoría porque tiene productos asociados', 'error');
                             return;
                         }
-        
+
                         console.log('Eliminando categoría:', categoryName, 'ID:', categoryId);
                         await db.ref('categories/' + categoryId).remove();
                         showNotification('Categoría eliminada exitosamente');
-        
+
                         if (activeCategory === categoryName) {
                             setActiveCategory('Ver Todo');
                         } else {
@@ -1048,13 +1178,13 @@
                     }
                 }
             }
-        
+
             function updateCategorySelects() {
                 const editSelect = document.getElementById('edit-category');
                 const newSelect = document.getElementById('new-category');
                 editSelect.innerHTML = '<option value="" disabled selected>Seleccione una categoría</option>';
                 newSelect.innerHTML = '<option value="" disabled selected>Seleccione una categoría</option>';
-        
+
                 const categories = categoriesList.querySelectorAll('.category-item:not([data-category="Ver Todo"])');
                 categories.forEach(category => {
                     const cleanCategoryName = category.dataset.category;
@@ -1069,40 +1199,32 @@
                 });
                 console.log('Category selects updated:', Array.from(editSelect.options).map(opt => opt.value));
             }
-        
+
             function createProductCard(product, productId) {
                 console.log('Creating product card:', product.name, 'Category:', product.category, 'ID:', productId);
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 card.dataset.category = product.category || '';
-        
+
                 const imageUrl = product.image && product.image.startsWith('data:image') ? product.image : (product.image || defaultImage);
                 const hasSizes = product.sizes && Object.keys(product.sizes).length > 0;
-                let sizesHTML = '';
                 let stockInfo = '';
-        
+
                 if (hasSizes) {
-                    sizesHTML = '<div class="product-sizes"><select class="size-selector">';
-                    sizesHTML += '<option value="">Seleccionar talla</option>';
-                    Object.entries(product.sizes).forEach(([size, stock]) => {
-                        const isAvailable = stock > 0;
-                        sizesHTML += `<option value="${size}" ${!isAvailable ? 'disabled' : ''}>${size} ${!isAvailable ? '(Agotado)' : `(${stock} disponibles)`}</option>`;
-                    });
-                    sizesHTML += '</select></div>';
                     const totalStock = Object.values(product.sizes).reduce((sum, current) => sum + current, 0);
-                    stockInfo = `<p class="stock-info">Stock: ${totalStock}</p>`;
+                    stockInfo = `<p class="stock-info">Stock total: ${totalStock}</p>`;
                 } else {
                     const stockAmount = product.stock || 0;
                     stockInfo = `<p class="stock-info">Stock: ${stockAmount}</p>`;
                 }
-        
+
                 card.innerHTML = `
                     <div class="product-image">
                         <img src="${imageUrl}" alt="${product.name}" onerror="this.src='${defaultImage}'">
                     </div>
                     <div class="product-info">
                         <h2 class="product-name">${product.name}</h2>
-                        ${sizesHTML}
+                        <p class="product-description">${product.description || 'Sin descripción'}</p>
                         ${stockInfo}
                         <div class="product-footer">
                             <p class="product-price">$${product.price.toFixed(2)}</p>
@@ -1111,55 +1233,44 @@
                         </div>
                     </div>
                 `;
-        
+
                 const addToCartBtn = card.querySelector('.add-to-cart');
                 addToCartBtn.addEventListener('click', () => {
-                    let selectedSize = '';
-                    let canAdd = true;
-        
+                    currentAddToCartProduct = { id: productId, ...product };
+                    document.getElementById('add-to-cart-title').textContent = `Añadir al Carrito: ${product.name}`;
+                    document.getElementById('add-to-cart-description').textContent = product.description || 'Sin descripción';
+                    const sizesContainer = document.getElementById('add-to-cart-sizes');
+                    const sizeSelectionGroup = document.getElementById('size-selection-group');
+                    sizesContainer.innerHTML = '';
+                    const imageElement = document.getElementById('add-to-cart-image');
+                    imageElement.src = imageUrl;
+                    imageElement.style.display = 'block';
+
                     if (hasSizes) {
-                        const sizeSelector = card.querySelector('.size-selector');
-                        selectedSize = sizeSelector.value;
-        
-                        if (!selectedSize) {
-                            showNotification('Por favor selecciona una talla', 'error');
-                            canAdd = false;
-                        }
-        
-                        if (canAdd && product.sizes[selectedSize] <= 0) {
-                            showNotification('Producto agotado en esta talla', 'error');
-                            canAdd = false;
-                        }
+                        sizeSelectionGroup.style.display = 'block';
+                        Object.entries(product.sizes).forEach(([size, stock]) => {
+                            const isAvailable = stock > 0;
+                            const sizeItem = document.createElement('div');
+                            sizeItem.className = 'size-item';
+                            sizeItem.innerHTML = `
+                                <input type="checkbox" class="size-checkbox" id="size-${size}" data-size="${size}" ${isAvailable ? '' : 'disabled'}>
+                                <label for="size-${size}" class="size-label">${size}</label>
+                                <span class="size-stock">(${stock} disponibles)</span>
+                            `;
+                            sizesContainer.appendChild(sizeItem);
+                        });
                     } else {
-                        if (product.stock <= 0) {
-                            showNotification('Producto agotado', 'error');
-                            canAdd = false;
-                        }
+                        sizeSelectionGroup.style.display = 'none';
                     }
-        
-                    if (canAdd) {
-                        const cart = JSON.parse(localStorage.getItem('cart') || '{}');
-                        const productKey = selectedSize ? `${productId}_${selectedSize}` : productId;
-        
-                        cart[productKey] = {
-                            id: productId,
-                            name: product.name,
-                            price: product.price,
-                            image: imageUrl,
-                            size: selectedSize,
-                            quantity: 1
-                        };
-        
-                        localStorage.setItem('cart', JSON.stringify(cart));
-                        updateCartCount();
-                        showNotification('Producto agregado al carrito');
-                    }
+
+                    addToCartModal.style.display = 'block';
                 });
-        
+
                 if (isAdmin && card.querySelector('.edit-product')) {
                     card.querySelector('.edit-product').addEventListener('click', () => {
                         currentEditProduct = { id: productId, ...product };
                         document.getElementById('edit-name').value = product.name;
+                        document.getElementById('edit-description').value = product.description || '';
                         document.getElementById('edit-price').value = product.price;
                         document.getElementById('edit-image').value = product.image && !product.image.startsWith('data:image') ? product.image : '';
                         document.getElementById('edit-category').value = product.category ? product.category.replace('×', '') : '';
@@ -1179,10 +1290,10 @@
                         console.log('Editing product:', product.name, 'Category:', product.category);
                     });
                 }
-        
+
                 return card;
             }
-        
+
             function addSizeField(container, size = '', stock = 0) {
                 const sizeRow = document.createElement('div');
                 sizeRow.className = 'size-row';
@@ -1196,14 +1307,14 @@
                 });
                 container.appendChild(sizeRow);
             }
-        
+
             async function loadProducts() {
                 if (!db) {
                     console.error('Base de datos no inicializada');
                     showNotification('Error: Base de datos no disponible', 'error');
                     return;
                 }
-        
+
                 try {
                     console.log('Loading products for category:', activeCategory);
                     const snapshot = await db.ref('products').once('value');
@@ -1232,23 +1343,18 @@
                     showNotification('Error al cargar productos', 'error');
                 }
             }
-        
-            function updateCartCount() {
-                const cart = JSON.parse(localStorage.getItem('cart') || '{}');
-                cartCountElement.textContent = Object.keys(cart).length;
-            }
-        
+
             loginButton.addEventListener('click', () => loginModal.style.display = 'block');
-        
+
             document.getElementById('submit-login').addEventListener('click', async () => {
                 const email = document.getElementById('login-email').value;
                 const password = document.getElementById('login-password').value;
-        
+
                 if (!email || !password) {
                     showNotification('Completa todos los campos', 'error');
                     return;
                 }
-        
+
                 const isValid = await checkAdminCredentials(email, password);
                 if (isValid) {
                     isAdmin = true;
@@ -1265,7 +1371,7 @@
                     showNotification('Credenciales incorrectas', 'error');
                 }
             });
-        
+
             logoutButton.addEventListener('click', () => {
                 isAdmin = false;
                 localStorage.removeItem('isAdmin');
@@ -1277,27 +1383,101 @@
                 loadCategories();
                 loadProducts();
             });
-        
+
+            document.getElementById('confirm-add-to-cart').addEventListener('click', () => {
+                if (!currentAddToCartProduct) return;
+
+                const cart = JSON.parse(localStorage.getItem('cart') || '{}');
+                const hasSizes = currentAddToCartProduct.sizes && Object.keys(currentAddToCartProduct.sizes).length > 0;
+                let addedItems = 0;
+                let errorMessage = '';
+
+                if (hasSizes) {
+                    const sizeItems = document.querySelectorAll('#add-to-cart-sizes .size-item');
+                    sizeItems.forEach(item => {
+                        const checkbox = item.querySelector('.size-checkbox');
+                        const size = checkbox.dataset.size;
+                        if (checkbox.checked) {
+                            if (currentAddToCartProduct.sizes[size] < 1) {
+                                errorMessage = `No hay stock disponible para ${size}`;
+                                return;
+                            }
+                            const productKey = `${currentAddToCartProduct.id}_${size}`;
+                            if (cart[productKey]) {
+                                cart[productKey].quantity = 1; // Fixed to 1 as per requirement
+                            } else {
+                                cart[productKey] = {
+                                    id: currentAddToCartProduct.id,
+                                    name: currentAddToCartProduct.name,
+                                    price: currentAddToCartProduct.price,
+                                    image: currentAddToCartProduct.image || defaultImage,
+                                    size: size,
+                                    quantity: 1
+                                };
+                            }
+                            addedItems++;
+                        }
+                    });
+                    if (addedItems === 0) {
+                        errorMessage = 'Selecciona al menos una talla';
+                    }
+                } else {
+                    if (currentAddToCartProduct.stock < 1) {
+                        errorMessage = 'No hay stock disponible';
+                    } else {
+                        const productKey = currentAddToCartProduct.id;
+                        if (cart[productKey]) {
+                            cart[productKey].quantity = 1; // Fixed to 1 as per requirement
+                        } else {
+                            cart[productKey] = {
+                                id: currentAddToCartProduct.id,
+                                name: currentAddToCartProduct.name,
+                                price: currentAddToCartProduct.price,
+                                image: currentAddToCartProduct.image || defaultImage,
+                                size: '',
+                                quantity: 1
+                            };
+                        }
+                        addedItems++;
+                    }
+                }
+
+                if (errorMessage) {
+                    showNotification(errorMessage, 'error');
+                    return;
+                }
+
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
+                addToCartModal.style.display = 'none';
+                showNotification(`${addedItems} artículo(s) agregado(s) al carrito`);
+            });
+
+            document.getElementById('cancel-add-to-cart').addEventListener('click', () => {
+                addToCartModal.style.display = 'none';
+                document.getElementById('add-to-cart-image').style.display = 'none';
+            });
+
             function getSizesFromForm(formId) {
                 const sizesContainer = document.getElementById(`${formId}-sizes-container`);
                 const sizeRows = sizesContainer.querySelectorAll('.size-row');
                 const sizes = {};
-        
+
                 sizeRows.forEach(row => {
                     const sizeInput = row.querySelector('.size-input');
                     const stockInput = row.querySelector('.stock-input');
-        
+
                     const size = sizeInput.value.trim();
                     const stock = parseInt(stockInput.value) || 0;
-        
+
                     if (size) {
                         sizes[size] = stock;
                     }
                 });
-        
+
                 return sizes;
             }
-        
+
             editImageFileInput.addEventListener('change', async () => {
                 if (editImageFileInput.files && editImageFileInput.files[0]) {
                     try {
@@ -1311,7 +1491,7 @@
                     editImagePreview.style.display = 'none';
                 }
             });
-        
+
             newImageFileInput.addEventListener('change', async () => {
                 if (newImageFileInput.files && newImageFileInput.files[0]) {
                     try {
@@ -1325,22 +1505,23 @@
                     newImagePreview.style.display = 'none';
                 }
             });
-        
+
             document.getElementById('save-product').addEventListener('click', async () => {
                 if (!currentEditProduct) return;
-        
+
                 const updatedProduct = {
                     name: document.getElementById('edit-name').value.trim(),
+                    description: document.getElementById('edit-description').value.trim(),
                     price: parseFloat(document.getElementById('edit-price').value),
                     category: document.getElementById('edit-category').value.trim(),
                     stock: parseInt(document.getElementById('edit-stock').value) || 0
                 };
-        
+
                 if (!updatedProduct.name || isNaN(updatedProduct.price) || !updatedProduct.category) {
                     showNotification('Nombre, precio y categoría son obligatorios', 'error');
                     return;
                 }
-        
+
                 const imageUrl = document.getElementById('edit-image').value.trim();
                 if (editImageFileInput.files && editImageFileInput.files[0]) {
                     try {
@@ -1356,14 +1537,14 @@
                 } else {
                     updatedProduct.image = defaultImage;
                 }
-        
+
                 const sizes = getSizesFromForm('edit');
                 if (Object.keys(sizes).length > 0) {
                     updatedProduct.sizes = sizes;
                 } else {
                     delete updatedProduct.sizes;
                 }
-        
+
                 try {
                     console.log('Updating product:', currentEditProduct.id, 'New category:', updatedProduct.category);
                     await db.ref('products/' + currentEditProduct.id).update(updatedProduct);
@@ -1378,21 +1559,51 @@
                     showNotification('Error al actualizar producto', 'error');
                 }
             });
-        
+
+            document.getElementById('delete-product').addEventListener('click', async () => {
+                if (!currentEditProduct) return;
+                if (!isAdmin) {
+                    showNotification('Debes ser administrador para eliminar productos', 'error');
+                    return;
+                }
+
+                if (confirm('¿Está seguro de que desea eliminar este producto? Esta acción no se puede deshacer.')) {
+                    try {
+                        console.log('Eliminando producto:', currentEditProduct.id);
+                        await db.ref('products/' + currentEditProduct.id).remove();
+                        const wasInCart = cleanCart(currentEditProduct.id);
+                        editProductModal.style.display = 'none';
+                        showNotification('Producto eliminado exitosamente');
+                        if (wasInCart) {
+                            showNotification('El producto ha sido removido de tu carrito');
+                        }
+                        loadProducts();
+                    } catch (error) {
+                        console.error('Error eliminando producto:', error);
+                        let errorMessage = 'Error al eliminar producto';
+                        if (error.code === 'PERMISSION_DENIED') {
+                            errorMessage = 'Permiso denegado: Inicia sesión como administrador';
+                        }
+                        showNotification(errorMessage, 'error');
+                    }
+                }
+            });
+
             document.getElementById('cancel-edit').addEventListener('click', () => {
                 editProductModal.style.display = 'none';
                 editImageFileInput.value = '';
                 editImagePreview.style.display = 'none';
             });
-        
+
             document.getElementById('add-size-button').addEventListener('click', () => {
                 const sizesContainer = document.getElementById('edit-sizes-container');
                 addSizeField(sizesContainer);
             });
-        
+
             if (addNewProductButton) {
                 addNewProductButton.addEventListener('click', () => {
                     document.getElementById('new-name').value = '';
+                    document.getElementById('new-description').value = '';
                     document.getElementById('new-price').value = '';
                     document.getElementById('new-image').value = '';
                     document.getElementById('new-image-file').value = '';
@@ -1406,26 +1617,27 @@
                     newProductModal.style.display = 'block';
                 });
             }
-        
+
             document.getElementById('add-new-size-button').addEventListener('click', () => {
                 const sizesContainer = document.getElementById('new-sizes-container');
                 addSizeField(sizesContainer);
             });
-        
+
             document.getElementById('create-product').addEventListener('click', async () => {
                 const newProduct = {
                     name: document.getElementById('new-name').value.trim(),
+                    description: document.getElementById('new-description').value.trim(),
                     price: parseFloat(document.getElementById('new-price').value),
                     category: document.getElementById('new-category').value.trim(),
                     stock: parseInt(document.getElementById('new-stock').value) || 0,
                     createdAt: firebase.database.ServerValue.TIMESTAMP
                 };
-        
+
                 if (!newProduct.name || isNaN(newProduct.price) || !newProduct.category) {
                     showNotification('Nombre, precio y categoría son obligatorios', 'error');
                     return;
                 }
-        
+
                 const imageUrl = document.getElementById('new-image').value.trim();
                 if (newImageFileInput.files && newImageFileInput.files[0]) {
                     try {
@@ -1439,12 +1651,12 @@
                 } else {
                     newProduct.image = defaultImage;
                 }
-        
+
                 const sizes = getSizesFromForm('new');
                 if (Object.keys(sizes).length > 0) {
                     newProduct.sizes = sizes;
                 }
-        
+
                 try {
                     const newProductKey = db.ref().child('products').push().key;
                     await db.ref('products/' + newProductKey).set(newProduct);
@@ -1459,13 +1671,13 @@
                     showNotification('Error al crear producto', 'error');
                 }
             });
-        
+
             document.getElementById('cancel-new').addEventListener('click', () => {
                 newProductModal.style.display = 'none';
                 newImageFileInput.value = '';
                 newImagePreview.style.display = 'none';
             });
-        
+
             window.addEventListener('click', (event) => {
                 if (event.target === loginModal) {
                     loginModal.style.display = 'none';
@@ -1480,8 +1692,12 @@
                     newImageFileInput.value = '';
                     newImagePreview.style.display = 'none';
                 }
+                if (event.target === addToCartModal) {
+                    addToCartModal.style.display = 'none';
+                    document.getElementById('add-to-cart-image').style.display = 'none';
+                }
             });
-        
+
             checkAuth();
             updateCartCount();
         });
