@@ -6,7 +6,6 @@
     <title>Sonya Store - Carrito</title>
     <meta name="description" content="Carrito de compras de Sonya Store.">
     <style>
-        /* Mantén los estilos originales, no requieren cambios */
         * {
             margin: 0;
             padding: 0;
@@ -66,7 +65,7 @@
             top: -0.25rem;
             right: -0.25rem;
             background: #d82c2cc7;
-            color: #000000;
+            color: #fff;
             font-size: 0.75rem;
             font-weight: 700;
             height: 1rem;
@@ -207,29 +206,6 @@
         .security-text {
             font-size: 0.875rem;
         }
-        .created-with {
-            display: flex;
-            align-items: center;
-        }
-        .created-text {
-            font-size: 0.875rem;
-            margin-right: 0.25rem;
-        }
-        .creator-logo {
-            display: flex;
-            align-items: center;
-        }
-        .creator-logo-img img {
-            width: 1.25rem;
-            height: 1.25rem;
-            margin-right: 0.25rem;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        .creator-name {
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
     </style>
 </head>
 <body>
@@ -278,7 +254,6 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                     <p class="security-text">Compra 100% segura</p>
                 </div>
-              
             </div>
         </div>
     </footer>
@@ -354,6 +329,7 @@
                 cartItemsContainer.innerHTML = '';
                 let total = 0;
                 let itemCount = 0;
+                let cartUpdated = false;
 
                 if (cartItems.length === 0) {
                     emptyCartMessage.style.display = 'block';
@@ -372,11 +348,50 @@
                     const productData = await getProductData(item.id);
                     if (!productData) {
                         delete cart[key];
-                        saveCart(cart);
+                        cartUpdated = true;
+                        showNotification(`Producto ${item.name} ya no está disponible`, 'error');
                         continue;
                     }
 
                     const hasSizes = productData.sizes && Object.keys(productData.sizes).length > 0;
+                    let isValidItem = true;
+
+                    // Validate size and stock
+                    if (hasSizes && item.size) {
+                        if (!productData.sizes[item.size] || productData.sizes[item.size] <= 0) {
+                            delete cart[key];
+                            cartUpdated = true;
+                            showNotification(`Talla ${item.size} de ${item.name} ya no está disponible`, 'error');
+                            continue;
+                        }
+                        if (item.quantity > productData.sizes[item.size]) {
+                            cart[key].quantity = productData.sizes[item.size];
+                            cartUpdated = true;
+                            showNotification(`Cantidad ajustada para ${item.name} talla ${item.size} debido a stock`, 'error');
+                        }
+                    } else if (!hasSizes && item.size) {
+                        // Item has a size but product no longer has sizes
+                        delete cart[key];
+                        cartUpdated = true;
+                        showNotification(`El producto ${item.name} ya no usa tallas`, 'error');
+                        continue;
+                    } else if (!hasSizes) {
+                        if (item.quantity > productData.stock) {
+                            cart[key].quantity = productData.stock;
+                            cartUpdated = true;
+                            showNotification(`Cantidad ajustada para ${item.name} debido a stock`, 'error');
+                        }
+                        if (productData.stock <= 0) {
+                            delete cart[key];
+                            cartUpdated = true;
+                            showNotification(`El producto ${item.name} ya no está disponible`, 'error');
+                            continue;
+                        }
+                    }
+
+                    if (!isValidItem) continue;
+
+                    // Generate size options for dropdown
                     let sizeOptions = '';
                     if (hasSizes) {
                         sizeOptions = Object.keys(productData.sizes)
@@ -400,6 +415,10 @@
                     itemCount++;
                 }
 
+                if (cartUpdated) {
+                    saveCart(cart);
+                }
+
                 cartTotalElement.textContent = `Total: $${total.toFixed(2)}`;
                 cartCountElement.textContent = itemCount;
 
@@ -412,7 +431,7 @@
                         const item = cart[key];
                         const productData = await getProductData(item.id);
 
-                        if (productData.sizes[newSize] <= 0) {
+                        if (!productData || !productData.sizes || !productData.sizes[newSize] || productData.sizes[newSize] <= 0) {
                             showNotification('Talla no disponible', 'error');
                             e.target.value = item.size;
                             return;
@@ -421,6 +440,12 @@
                         const newKey = `${item.id}_${newSize}`;
                         if (newKey !== key && cart[newKey]) {
                             showNotification('Este producto con esta talla ya está en el carrito', 'error');
+                            e.target.value = item.size;
+                            return;
+                        }
+
+                        if (item.quantity > productData.sizes[newSize]) {
+                            showNotification(`No hay suficiente stock para talla ${newSize} (máximo: ${productData.sizes[newSize]})`, 'error');
                             e.target.value = item.size;
                             return;
                         }
@@ -443,7 +468,21 @@
                         const item = cart[key];
                         const productData = await getProductData(item.id);
 
-                        let maxQuantity = item.size && productData.sizes ? productData.sizes[item.size] : productData.stock;
+                        if (!productData) {
+                            delete cart[key];
+                            saveCart(cart);
+                            renderCart();
+                            showNotification('Producto no disponible', 'error');
+                            return;
+                        }
+
+                        let maxQuantity;
+                        if (item.size && productData.sizes && productData.sizes[item.size]) {
+                            maxQuantity = productData.sizes[item.size];
+                        } else {
+                            maxQuantity = productData.stock || 0;
+                        }
+
                         if (quantity > maxQuantity) {
                             showNotification(`No hay suficiente stock (máximo: ${maxQuantity})`, 'error');
                             e.target.value = item.quantity;
