@@ -268,7 +268,7 @@
             .products-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
         }
         .product-card {
-            background: #fff;
+            background: #ffffff;
             border: 1px solid #e5e7eb;
             border-radius: 0.375rem;
             overflow: hidden;
@@ -279,7 +279,7 @@
         }
         .product-image {
             aspect-ratio: 1/1;
-            background: #f9fafb;
+            background: #c2daf1;
         }
         .product-image img {
             width: 100%;
@@ -291,24 +291,54 @@
             padding: 0.75rem;
         }
         .product-name {
-            font-size: 0.875rem;
-            font-weight: 500;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            height: 2.5rem;
-            margin-bottom: 0.25rem;
-        }
-        .product-description {
-            font-size: 0.75rem;
-            color: #6b7280;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            margin-bottom: 0.25rem;
-        }
+    font-size: 0.875rem; /* 14px, suitable for both PC and mobile */
+    font-weight: 500;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+     animation: neon-glow 1.5s ease-in-out infinite alternate;
+    overflow: hidden;
+    font-weight:800;
+    text-overflow: ellipsis;
+    line-height: 1.25rem; /* Consistent line height for 2 lines */
+    height: 2.5rem; /* 2 lines * 1.25rem */
+    margin-bottom: 0.25rem;
+    text-shadow: #000000;
+}
+.product-description {
+    font-size: 0.75rem; /* 12px, readable on mobile */
+    color: #6b7280;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Limit to 3 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1rem; /* Consistent line height for 3 lines */
+    height: 3rem; /* 3 lines * 1rem */
+    margin-bottom: 0.25rem;
+}
+@media (max-width: 640px) {
+    .product-name {
+        font-size: 0.8125rem; /* Slightly smaller for smaller screens */
+        line-height: 1.125rem;
+        height: 2.25rem; /* Adjust height for 2 lines */
+    }
+
+    .product-description {
+        font-size: 0.6875rem; /* Slightly smaller for mobile */
+        line-height: 0.875rem;
+        height: 2.625rem; /* Adjust height for 3 lines */
+    }
+
+    .product-card {
+        padding-bottom: 0.5rem; /* Add padding to prevent content cutoff */
+    }
+
+    .product-info {
+        padding: 0.5rem; /* Slightly reduced padding for mobile */
+    }
+}
         .product-footer {
             display: flex;
             align-items: center;
@@ -324,15 +354,15 @@
             display: flex;
             align-items: center;
             font-size: 0.75rem;
-            border: 1px solid #111827;
+            background: #befcdf;
+            border: 1px solid #d1d5db;
             border-radius: 0.375rem;
             padding: 0.25rem 0.5rem;
-            background: none;
             touch-action: manipulation;
         }
         .add-to-cart.disabled {
-            border-color: #d1d5db;
-            color: #d1d5db;
+            border-color: #568ad8;
+            color: #1874ff;
             cursor: not-allowed;
         }
         .load-more-products {
@@ -352,7 +382,7 @@
             max-width: 300px;
         }
         footer {
-            border-top: 1px solid #e5e7eb;
+            border-top: 1px solid #95a8ce;
             padding: 1rem 0;
         }
         .footer-content {
@@ -470,12 +500,6 @@
             font-size: 0.875rem;
             min-width: 100px;
         }
-        .stock-input {
-            width: 120px;
-            padding: 0.5rem;
-            font-size: 0.875rem;
-            min-width: 80px;
-        }
         .remove-size {
             background: #d82c2cc7;
             color: #fff;
@@ -493,7 +517,7 @@
                 flex-direction: column;
                 align-items: stretch;
             }
-            .size-input, .stock-input {
+            .size-input {
                 width: 100%;
                 margin-bottom: 0.5rem;
             }
@@ -516,9 +540,6 @@
         #add-new-product:hover {
             background: #45a049;
         }
-        .product-sizes {
-            margin: 0.5rem 0;
-        }
         .size-item {
             display: inline-flex;
             align-items: center;
@@ -533,8 +554,7 @@
             justify-content: center;
             width: 2rem;
             height: 2rem;
-            border: 1px solid rgb(0, 0, 0);
-            border-color: #000000;
+            border: 1px solid #000000;
             border-radius: 50%;
             background: #ffffff;
             color: #000000;
@@ -544,20 +564,15 @@
             transition: background 0.2s, color 0.2s;
             text-align: center;
             line-height: 2rem;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .size-label-small {
+            font-size: 0.6rem;
         }
         .size-checkbox:checked + .size-label {
-            background: #00ff15;
-            color: #242424;
-        }
-        .size-checkbox:disabled + .size-label {
-            background: #6b6b6b;
-            color: #000000;
-            cursor: not-allowed;
-        }
-        .size-stock {
-            font-size: 0.75rem;
-            color: #6b7280;
-            margin-left: 0.5rem;
+            background: #00a680;
+            color: #ffffff;
         }
         .secondary-button {
             background: #f3f4f6;
@@ -769,11 +784,11 @@
                 <select id="edit-category" required aria-label="Categoría del producto"></select>
             </div>
             <div class="form-group">
-                <label for="edit-stock">Stock General (para productos sin tallas):</label>
-                <input type="number" id="edit-stock" min="0" value="0" aria-label="Stock general">
+                <label for="edit-stock">Stock:</label>
+                <input type="number" id="edit-stock" min="0" value="0" aria-label="Stock del producto">
             </div>
             <div class="form-group">
-                <label>Tallas y Stock:</label>
+                <label>Tallas:</label>
                 <div id="edit-sizes-container"></div>
                 <button type="button" id="add-size-button" class="secondary-button" aria-label="Añadir talla">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
@@ -816,11 +831,11 @@
                 <select id="new-category" required aria-label="Categoría del nuevo producto"></select>
             </div>
             <div class="form-group">
-                <label for="new-stock">Stock General (para productos sin tallas):</label>
-                <input type="number" id="new-stock" min="0" value="0" aria-label="Stock general del nuevo producto">
+                <label for="new-stock">Stock:</label>
+                <input type="number" id="new-stock" min="0" value="0" aria-label="Stock del nuevo producto">
             </div>
             <div class="form-group">
-                <label>Tallas y Stock:</label>
+                <label>Tallas:</label>
                 <div id="new-sizes-container"></div>
                 <button type="button" id="add-new-size-button" class="secondary-button" aria-label="Añadir talla">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
@@ -841,11 +856,15 @@
             <div class="add-to-cart-details">
                 <h2 id="add-to-cart-title">Añadir al Carrito</h2>
                 <div class="form-group">
+                    <label>Precio:</label>
+                    <p id="add-to-cart-price" style="font-size: 1rem; font-weight: 700; color: #111827;"></p>
+                </div>
+                <div class="form-group">
                     <label>Descripción:</label>
                     <p id="add-to-cart-description" style="font-size: 0.875rem; color: #4b5563;"></p>
                 </div>
                 <div class="form-group" id="size-selection-group" style="display: none;">
-                    <label>Seleccionar Tallas:</label>
+                    <label>Talla:</label>
                     <div id="add-to-cart-sizes"></div>
                 </div>
                 <div class="form-actions">
@@ -860,7 +879,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
     <script>
         let db = null;
-
+    
         if (typeof firebase === 'undefined') {
             console.error('Firebase SDK no cargado.');
             alert('Error: Firebase SDK no cargado.');
@@ -884,7 +903,7 @@
                 alert('Error inicializando Firebase.');
             }
         }
-
+    
         document.addEventListener('DOMContentLoaded', function() {
             const productsGrid = document.getElementById('products-grid');
             const loginButton = document.getElementById('login-button');
@@ -901,17 +920,21 @@
             const editImagePreview = document.getElementById('edit-image-preview');
             const newImageFileInput = document.getElementById('new-image-file');
             const newImagePreview = document.getElementById('new-image-preview');
-
+            const loadMoreButton = document.getElementById('load-more-products');
+    
             let isAdmin = false;
             let currentEditProduct = null;
             let currentAddToCartProduct = null;
             let activeCategory = 'Ver Todo';
             const defaultImage = 'logo.png';
-
+            let displayedProducts = 0; // Track number of displayed products
+            const productsPerPage = 15; // Number of products to load per batch
+            let allProducts = []; // Store all products for pagination
+    
             function normalizeCategory(category) {
                 return category ? category.trim().toLowerCase().replace('×', '') : '';
             }
-
+    
             function showNotification(message, type = 'success') {
                 const notification = document.createElement('div');
                 notification.className = `notification ${type}`;
@@ -919,7 +942,7 @@
                 document.body.appendChild(notification);
                 setTimeout(() => notification.remove(), 3000);
             }
-
+    
             function getBase64(file) {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
@@ -928,7 +951,7 @@
                     reader.onerror = error => reject(error);
                 });
             }
-
+    
             async function checkAdminCredentials(email, password) {
                 if (!db) {
                     console.error('Base de datos no disponible');
@@ -944,7 +967,7 @@
                     return false;
                 }
             }
-
+    
             function cleanCart(deletedProductId) {
                 const cart = JSON.parse(localStorage.getItem('cart') || '{}');
                 let wasInCart = false;
@@ -958,12 +981,12 @@
                 updateCartCount();
                 return wasInCart;
             }
-
+    
             function updateCartCount() {
                 const cart = JSON.parse(localStorage.getItem('cart') || '{}');
                 cartCountElement.textContent = Object.keys(cart).length;
             }
-
+    
             function checkAuth() {
                 isAdmin = localStorage.getItem('isAdmin') === 'true';
                 loginButton.style.display = isAdmin ? 'none' : 'block';
@@ -973,19 +996,19 @@
                 loadCategories();
                 loadProducts();
             }
-
+    
             async function loadCategories() {
                 if (!db) {
                     console.error('Base de datos no inicializada');
                     showNotification('Error: Base de datos no disponible', 'error');
                     return;
                 }
-
+    
                 try {
                     console.log('Intentando cargar categorías...');
                     const snapshot = await db.ref('categories').once('value');
                     console.log('Snapshot recibido:', snapshot.val());
-
+    
                     categoriesList.innerHTML = `
                         <a href="#" class="category-item ${activeCategory === 'Ver Todo' ? 'category-active' : 'category-inactive'}" data-category="Ver Todo">Ver Todo</a>
                         <button class="add-category" id="add-category" style="display: ${isAdmin ? 'block' : 'none'};">
@@ -995,11 +1018,11 @@
                     `;
                     const newAddCategoryButton = document.getElementById('add-category');
                     newAddCategoryButton.addEventListener('click', addCategory);
-
+    
                     if (snapshot.exists()) {
                         const categories = snapshot.val();
                         console.log('Categorías encontradas:', categories);
-
+    
                         Object.entries(categories).forEach(([categoryId, category]) => {
                             const cleanCategoryName = category.name.replace('×', '');
                             const categoryElement = document.createElement('a');
@@ -1008,7 +1031,7 @@
                             categoryElement.textContent = cleanCategoryName;
                             categoryElement.dataset.category = cleanCategoryName;
                             categoryElement.dataset.id = categoryId;
-
+    
                             if (isAdmin) {
                                 const deleteButton = document.createElement('button');
                                 deleteButton.className = 'delete-category';
@@ -1019,40 +1042,40 @@
                                 });
                                 categoryElement.appendChild(deleteButton);
                             }
-
+    
                             categoryElement.addEventListener('click', (e) => {
                                 e.preventDefault();
                                 setActiveCategory(cleanCategoryName);
                             });
-
+    
                             categoriesList.insertBefore(categoryElement, newAddCategoryButton);
                         });
                     } else {
                         console.log('No se encontraron categorías, creando categoría predeterminada "Caballeros"');
                         const newCategoryRef = db.ref('categories').push();
                         await newCategoryRef.set({ name: 'Caballeros' });
-
+    
                         const defaultCategory = document.createElement('a');
                         defaultCategory.href = '#';
                         defaultCategory.className = `category-item ${activeCategory === 'Caballeros' ? 'category-active' : 'category-inactive'}`;
                         defaultCategory.textContent = 'Caballeros';
                         defaultCategory.dataset.category = 'Caballeros';
                         defaultCategory.dataset.id = newCategoryRef.key;
-
+    
                         defaultCategory.addEventListener('click', (e) => {
                             e.preventDefault();
                             setActiveCategory('Caballeros');
                         });
-
+    
                         categoriesList.insertBefore(defaultCategory, newAddCategoryButton);
                     }
-
+    
                     const verTodoElement = categoriesList.querySelector('[data-category="Ver Todo"]');
                     verTodoElement.addEventListener('click', (e) => {
                         e.preventDefault();
                         setActiveCategory('Ver Todo');
                     });
-
+    
                     updateCategorySelects();
                     console.log('Categorías cargadas exitosamente');
                 } catch (error) {
@@ -1064,35 +1087,37 @@
                     showNotification('Error al cargar categorías: ' + error.message, 'error');
                 }
             }
-
+    
             function setActiveCategory(category) {
                 console.log('Setting active category:', category);
                 activeCategory = category;
+                displayedProducts = 0; // Reset displayed products when category changes
+                allProducts = []; // Clear stored products
                 const categoryItems = categoriesList.querySelectorAll('.category-item');
                 categoryItems.forEach(item => {
                     item.className = `category-item ${item.dataset.category === category ? 'category-active' : 'category-inactive'}`;
                 });
                 loadProducts();
             }
-
+    
             async function addCategory() {
                 if (!isAdmin) {
                     showNotification('Debes ser administrador para añadir categorías', 'error');
                     return;
                 }
-
+    
                 const categoryName = prompt('Ingrese el nombre de la nueva categoría:');
                 if (!categoryName || !categoryName.trim()) {
                     showNotification('El nombre de la categoría no puede estar vacío', 'error');
                     return;
                 }
-
+    
                 const trimmedName = categoryName.trim();
                 if (trimmedName.toLowerCase() === 'ver todo') {
                     showNotification('El nombre "Ver Todo" está reservado', 'error');
                     return;
                 }
-
+    
                 try {
                     const snapshot = await db.ref('categories').once('value');
                     if (snapshot.exists()) {
@@ -1105,7 +1130,7 @@
                             return;
                         }
                     }
-
+    
                     console.log('Añadiendo categoría:', trimmedName);
                     const newCategoryRef = db.ref('categories').push();
                     await newCategoryRef.set({ name: trimmedName });
@@ -1124,23 +1149,23 @@
                     showNotification(errorMessage, 'error');
                 }
             }
-
+    
             async function deleteCategory(categoryId) {
                 if (!isAdmin) {
                     showNotification('Debes ser administrador para eliminar categorías', 'error');
                     return;
                 }
-
+    
                 if (confirm('¿Está seguro de que desea eliminar esta categoría?')) {
                     try {
                         const categoryElement = categoriesList.querySelector(`[data-id="${categoryId}"]`);
                         const categoryName = categoryElement ? categoryElement.dataset.category : null;
-
+    
                         if (!categoryName) {
                             showNotification('No se encontró la categoría', 'error');
                             return;
                         }
-
+    
                         const productsSnapshot = await db.ref('products').once('value');
                         let hasProducts = false;
                         if (productsSnapshot.exists()) {
@@ -1149,16 +1174,16 @@
                                 normalizeCategory(product.category) === normalizeCategory(categoryName)
                             );
                         }
-
+    
                         if (hasProducts) {
                             showNotification('No se puede eliminar la categoría porque tiene productos asociados', 'error');
                             return;
                         }
-
+    
                         console.log('Eliminando categoría:', categoryName, 'ID:', categoryId);
                         await db.ref('categories/' + categoryId).remove();
                         showNotification('Categoría eliminada exitosamente');
-
+    
                         if (activeCategory === categoryName) {
                             setActiveCategory('Ver Todo');
                         } else {
@@ -1178,13 +1203,13 @@
                     }
                 }
             }
-
+    
             function updateCategorySelects() {
                 const editSelect = document.getElementById('edit-category');
                 const newSelect = document.getElementById('new-category');
                 editSelect.innerHTML = '<option value="" disabled selected>Seleccione una categoría</option>';
                 newSelect.innerHTML = '<option value="" disabled selected>Seleccione una categoría</option>';
-
+    
                 const categories = categoriesList.querySelectorAll('.category-item:not([data-category="Ver Todo"])');
                 categories.forEach(category => {
                     const cleanCategoryName = category.dataset.category;
@@ -1199,25 +1224,57 @@
                 });
                 console.log('Category selects updated:', Array.from(editSelect.options).map(opt => opt.value));
             }
-
+    
+            function addSizeField(container, size = '') {
+                const sizeRow = document.createElement('div');
+                sizeRow.className = 'size-row';
+                sizeRow.innerHTML = `
+                    <input type="text" class="size-input" placeholder="Talla (ej. M,S,XL)" value="${size}">
+                    <button type="button" class="remove-size">×</button>
+                `;
+                const sizeInput = sizeRow.querySelector('.size-input');
+                sizeInput.addEventListener('change', () => {
+                    const inputValue = sizeInput.value.trim();
+                    if (inputValue.includes(',')) {
+                        const sizes = inputValue.split(',').map(s => s.trim()).filter(s => s);
+                        if (sizes.length > 1) {
+                            sizeRow.remove(); // Remove the current row
+                            sizes.forEach(s => addSizeField(container, s)); // Add a new row for each size
+                        }
+                    }
+                });
+                sizeRow.querySelector('.remove-size').addEventListener('click', () => {
+                    sizeRow.remove();
+                });
+                container.appendChild(sizeRow);
+            }
+    
+            function getSizesFromForm(formId) {
+                const sizesContainer = document.getElementById(`${formId}-sizes-container`);
+                const sizeRows = sizesContainer.querySelectorAll('.size-row');
+                const sizes = [];
+    
+                sizeRows.forEach(row => {
+                    const sizeInput = row.querySelector('.size-input');
+                    const size = sizeInput.value.trim();
+                    if (size) {
+                        sizes.push(size);
+                    }
+                });
+    
+                return sizes;
+            }
+    
             function createProductCard(product, productId) {
                 console.log('Creating product card:', product.name, 'Category:', product.category, 'ID:', productId);
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 card.dataset.category = product.category || '';
-
+    
                 const imageUrl = product.image && product.image.startsWith('data:image') ? product.image : (product.image || defaultImage);
-                const hasSizes = product.sizes && Object.keys(product.sizes).length > 0;
-                let stockInfo = '';
-
-                if (hasSizes) {
-                    const totalStock = Object.values(product.sizes).reduce((sum, current) => sum + current, 0);
-                    stockInfo = `<p class="stock-info">Stock total: ${totalStock}</p>`;
-                } else {
-                    const stockAmount = product.stock || 0;
-                    stockInfo = `<p class="stock-info">Stock: ${stockAmount}</p>`;
-                }
-
+                const stockAmount = product.stock || 0;
+                const hasSizes = product.sizes && Array.isArray(product.sizes) && product.sizes.length > 0;
+    
                 card.innerHTML = `
                     <div class="product-image">
                         <img src="${imageUrl}" alt="${product.name}" onerror="this.src='${defaultImage}'">
@@ -1225,19 +1282,19 @@
                     <div class="product-info">
                         <h2 class="product-name">${product.name}</h2>
                         <p class="product-description">${product.description || 'Sin descripción'}</p>
-                        ${stockInfo}
                         <div class="product-footer">
                             <p class="product-price">$${product.price.toFixed(2)}</p>
-                            <button class="add-to-cart" data-id="${productId}">Agregar</button>
+                            <button class="add-to-cart" data-id="${productId}" ${stockAmount === 0 ? 'disabled' : ''}>+ Añadir</button>
                             ${isAdmin ? `<button class="edit-product" data-id="${productId}">Editar</button>` : ''}
                         </div>
                     </div>
                 `;
-
+    
                 const addToCartBtn = card.querySelector('.add-to-cart');
                 addToCartBtn.addEventListener('click', () => {
                     currentAddToCartProduct = { id: productId, ...product };
                     document.getElementById('add-to-cart-title').textContent = `Añadir al Carrito: ${product.name}`;
+                    document.getElementById('add-to-cart-price').textContent = `$${product.price.toFixed(2)}`;
                     document.getElementById('add-to-cart-description').textContent = product.description || 'Sin descripción';
                     const sizesContainer = document.getElementById('add-to-cart-sizes');
                     const sizeSelectionGroup = document.getElementById('size-selection-group');
@@ -1245,27 +1302,25 @@
                     const imageElement = document.getElementById('add-to-cart-image');
                     imageElement.src = imageUrl;
                     imageElement.style.display = 'block';
-
+    
                     if (hasSizes) {
                         sizeSelectionGroup.style.display = 'block';
-                        Object.entries(product.sizes).forEach(([size, stock]) => {
-                            const isAvailable = stock > 0;
+                        product.sizes.forEach(size => {
                             const sizeItem = document.createElement('div');
                             sizeItem.className = 'size-item';
                             sizeItem.innerHTML = `
-                                <input type="checkbox" class="size-checkbox" id="size-${size}" data-size="${size}" ${isAvailable ? '' : 'disabled'}>
+                                <input type="checkbox" class="size-checkbox" id="size-${size}" data-size="${size}">
                                 <label for="size-${size}" class="size-label">${size}</label>
-                                <span class="size-stock">(${stock} disponibles)</span>
                             `;
                             sizesContainer.appendChild(sizeItem);
                         });
                     } else {
                         sizeSelectionGroup.style.display = 'none';
                     }
-
+    
                     addToCartModal.style.display = 'block';
                 });
-
+    
                 if (isAdmin && card.querySelector('.edit-product')) {
                     card.querySelector('.edit-product').addEventListener('click', () => {
                         currentEditProduct = { id: productId, ...product };
@@ -1274,87 +1329,123 @@
                         document.getElementById('edit-price').value = product.price;
                         document.getElementById('edit-image').value = product.image && !product.image.startsWith('data:image') ? product.image : '';
                         document.getElementById('edit-category').value = product.category ? product.category.replace('×', '') : '';
+                        document.getElementById('edit-stock').value = product.stock || 0;
                         const sizesContainer = document.getElementById('edit-sizes-container');
                         sizesContainer.innerHTML = '';
-                        if (product.sizes && Object.keys(product.sizes).length > 0) {
-                            Object.entries(product.sizes).forEach(([size, stock]) => {
-                                addSizeField(sizesContainer, size, stock);
+                        if (hasSizes) {
+                            product.sizes.forEach(size => {
+                                addSizeField(sizesContainer, size);
                             });
                         } else {
                             addSizeField(sizesContainer);
                         }
-                        document.getElementById('edit-stock').value = product.stock || 0;
                         editImagePreview.src = imageUrl;
                         editImagePreview.style.display = product.image ? 'block' : 'none';
                         editProductModal.style.display = 'block';
                         console.log('Editing product:', product.name, 'Category:', product.category);
                     });
                 }
-
+    
                 return card;
             }
-
-            function addSizeField(container, size = '', stock = 0) {
-                const sizeRow = document.createElement('div');
-                sizeRow.className = 'size-row';
-                sizeRow.innerHTML = `
-                    <input type="text" class="size-input" placeholder="Talla" value="${size}">
-                    <input type="number" class="stock-input" placeholder="Stock" min="0" value="${stock}">
-                    <button type="button" class="remove-size">×</button>
-                `;
-                sizeRow.querySelector('.remove-size').addEventListener('click', () => {
-                    sizeRow.remove();
-                });
-                container.appendChild(sizeRow);
-            }
-
+    
             async function loadProducts() {
                 if (!db) {
                     console.error('Base de datos no inicializada');
                     showNotification('Error: Base de datos no disponible', 'error');
                     return;
                 }
-
+    
                 try {
                     console.log('Loading products for category:', activeCategory);
                     const snapshot = await db.ref('products').once('value');
                     productsGrid.innerHTML = '';
+                    displayedProducts = 0;
+                    allProducts = [];
+    
                     if (snapshot.exists()) {
                         const products = snapshot.val();
-                        let productCount = 0;
+                        // Convert products to an array for easier handling
                         Object.entries(products).forEach(([productId, product]) => {
+                            allProducts.push({ id: productId, ...product });
+                        });
+    
+                        // Filter products by active category
+                        const filteredProducts = allProducts.filter(product => {
                             const productCategory = normalizeCategory(product.category);
                             const activeCat = normalizeCategory(activeCategory);
-                            console.log(`Product: ${product.name}, Category: ${productCategory}, Active: ${activeCat}`);
-                            if (activeCat === normalizeCategory('Ver Todo') || productCategory === activeCat) {
-                                productsGrid.appendChild(createProductCard(product, productId));
-                                productCount++;
-                            }
+                            return activeCat === normalizeCategory('Ver Todo') || productCategory === activeCat;
                         });
-                        console.log(`Loaded ${productCount} products for category: ${activeCategory}`);
-                        if (productCount === 0) {
+    
+                        // Display up to productsPerPage (15) products
+                        const productsToDisplay = filteredProducts.slice(0, productsPerPage);
+                        productsToDisplay.forEach(product => {
+                            productsGrid.appendChild(createProductCard(product, product.id));
+                            displayedProducts++;
+                        });
+    
+                        console.log(`Loaded ${displayedProducts} products for category: ${activeCategory}`);
+    
+                        if (displayedProducts === 0) {
                             productsGrid.innerHTML = '<p>No hay productos en esta categoría.</p>';
+                            loadMoreButton.parentElement.style.display = 'none';
+                        } else {
+                            // Show or hide "Load More" button based on remaining products
+                            loadMoreButton.parentElement.style.display = displayedProducts < filteredProducts.length ? 'flex' : 'none';
                         }
                     } else {
                         productsGrid.innerHTML = '<p>No hay productos disponibles.</p>';
+                        loadMoreButton.parentElement.style.display = 'none';
                     }
                 } catch (error) {
                     console.error('Error cargando productos:', error);
                     showNotification('Error al cargar productos', 'error');
                 }
             }
-
+    
+            async function loadMoreProducts() {
+                try {
+                    // Filter remaining products that haven't been displayed yet
+                    const filteredProducts = allProducts.filter(product => {
+                        const productCategory = normalizeCategory(product.category);
+                        const activeCat = normalizeCategory(activeCategory);
+                        return activeCat === normalizeCategory('Ver Todo') || productCategory === activeCat;
+                    });
+    
+                    // Get the next batch of products
+                    const nextProducts = filteredProducts.slice(displayedProducts, displayedProducts + productsPerPage);
+    
+                    // Display the next batch
+                    nextProducts.forEach(product => {
+                        productsGrid.appendChild(createProductCard(product, product.id));
+                        displayedProducts++;
+                    });
+    
+                    console.log(`Loaded additional ${nextProducts.length} products. Total displayed: ${displayedProducts}`);
+    
+                    // Hide "Load More" button if no more products are available
+                    loadMoreButton.parentElement.style.display = displayedProducts < filteredProducts.length ? 'flex' : 'none';
+    
+                    if (nextProducts.length === 0) {
+                        showNotification('No hay más productos para cargar', 'info');
+                    }
+                } catch (error) {
+                    console.error('Error cargando más productos:', error);
+                    showNotification('Error al cargar más productos', 'error');
+                }
+            }
+    
             loginButton.addEventListener('click', () => loginModal.style.display = 'block');
-
+    
             document.getElementById('submit-login').addEventListener('click', async () => {
                 const email = document.getElementById('login-email').value;
                 const password = document.getElementById('login-password').value;
-
+    
                 if (!email || !password) {
                     showNotification('Completa todos los campos', 'error');
                     return;
                 }
-
+    
                 const isValid = await checkAdminCredentials(email, password);
                 if (isValid) {
                     isAdmin = true;
@@ -1371,7 +1462,7 @@
                     showNotification('Credenciales incorrectas', 'error');
                 }
             });
-
+    
             logoutButton.addEventListener('click', () => {
                 isAdmin = false;
                 localStorage.removeItem('isAdmin');
@@ -1383,101 +1474,61 @@
                 loadCategories();
                 loadProducts();
             });
-
+    
             document.getElementById('confirm-add-to-cart').addEventListener('click', () => {
                 if (!currentAddToCartProduct) return;
-
+    
                 const cart = JSON.parse(localStorage.getItem('cart') || '{}');
-                const hasSizes = currentAddToCartProduct.sizes && Object.keys(currentAddToCartProduct.sizes).length > 0;
-                let addedItems = 0;
-                let errorMessage = '';
-
-                if (hasSizes) {
-                    const sizeItems = document.querySelectorAll('#add-to-cart-sizes .size-item');
-                    sizeItems.forEach(item => {
-                        const checkbox = item.querySelector('.size-checkbox');
-                        const size = checkbox.dataset.size;
-                        if (checkbox.checked) {
-                            if (currentAddToCartProduct.sizes[size] < 1) {
-                                errorMessage = `No hay stock disponible para ${size}`;
-                                return;
-                            }
-                            const productKey = `${currentAddToCartProduct.id}_${size}`;
-                            if (cart[productKey]) {
-                                cart[productKey].quantity = 1; // Fixed to 1 as per requirement
-                            } else {
-                                cart[productKey] = {
-                                    id: currentAddToCartProduct.id,
-                                    name: currentAddToCartProduct.name,
-                                    price: currentAddToCartProduct.price,
-                                    image: currentAddToCartProduct.image || defaultImage,
-                                    size: size,
-                                    quantity: 1
-                                };
-                            }
-                            addedItems++;
-                        }
-                    });
-                    if (addedItems === 0) {
-                        errorMessage = 'Selecciona al menos una talla';
-                    }
-                } else {
-                    if (currentAddToCartProduct.stock < 1) {
-                        errorMessage = 'No hay stock disponible';
-                    } else {
-                        const productKey = currentAddToCartProduct.id;
-                        if (cart[productKey]) {
-                            cart[productKey].quantity = 1; // Fixed to 1 as per requirement
-                        } else {
-                            cart[productKey] = {
-                                id: currentAddToCartProduct.id,
-                                name: currentAddToCartProduct.name,
-                                price: currentAddToCartProduct.price,
-                                image: currentAddToCartProduct.image || defaultImage,
-                                size: '',
-                                quantity: 1
-                            };
-                        }
-                        addedItems++;
-                    }
-                }
-
-                if (errorMessage) {
-                    showNotification(errorMessage, 'error');
+                const stockAmount = currentAddToCartProduct.stock || 0;
+                const hasSizes = currentAddToCartProduct.sizes && Array.isArray(currentAddToCartProduct.sizes) && currentAddToCartProduct.sizes.length > 0;
+                let selectedSize = '';
+    
+                if (stockAmount < 1) {
+                    showNotification('No hay stock disponible', 'error');
                     return;
                 }
-
+    
+                if (hasSizes) {
+                    const sizeItems = document.querySelectorAll('#add-to-cart-sizes .size-item');
+                    let selectedCount = 0;
+                    sizeItems.forEach(item => {
+                        const checkbox = item.querySelector('.size-checkbox');
+                        if (checkbox.checked) {
+                            selectedSize = checkbox.dataset.size;
+                            selectedCount++;
+                        }
+                    });
+                    if (selectedCount !== 1) {
+                        showNotification('Selecciona exactamente una talla', 'error');
+                        return;
+                    }
+                }
+    
+                const productKey = hasSizes ? `${currentAddToCartProduct.id}_${selectedSize}` : currentAddToCartProduct.id;
+                if (cart[productKey]) {
+                    cart[productKey].quantity = 1; // Fixed to 1 as per requirement
+                } else {
+                    cart[productKey] = {
+                        id: currentAddToCartProduct.id,
+                        name: currentAddToCartProduct.name,
+                        price: currentAddToCartProduct.price,
+                        image: currentAddToCartProduct.image || defaultImage,
+                        size: selectedSize,
+                        quantity: 1
+                    };
+                }
+    
                 localStorage.setItem('cart', JSON.stringify(cart));
                 updateCartCount();
                 addToCartModal.style.display = 'none';
-                showNotification(`${addedItems} artículo(s) agregado(s) al carrito`);
+                showNotification('Artículo agregado al carrito');
             });
-
+    
             document.getElementById('cancel-add-to-cart').addEventListener('click', () => {
                 addToCartModal.style.display = 'none';
                 document.getElementById('add-to-cart-image').style.display = 'none';
             });
-
-            function getSizesFromForm(formId) {
-                const sizesContainer = document.getElementById(`${formId}-sizes-container`);
-                const sizeRows = sizesContainer.querySelectorAll('.size-row');
-                const sizes = {};
-
-                sizeRows.forEach(row => {
-                    const sizeInput = row.querySelector('.size-input');
-                    const stockInput = row.querySelector('.stock-input');
-
-                    const size = sizeInput.value.trim();
-                    const stock = parseInt(stockInput.value) || 0;
-
-                    if (size) {
-                        sizes[size] = stock;
-                    }
-                });
-
-                return sizes;
-            }
-
+    
             editImageFileInput.addEventListener('change', async () => {
                 if (editImageFileInput.files && editImageFileInput.files[0]) {
                     try {
@@ -1491,7 +1542,7 @@
                     editImagePreview.style.display = 'none';
                 }
             });
-
+    
             newImageFileInput.addEventListener('change', async () => {
                 if (newImageFileInput.files && newImageFileInput.files[0]) {
                     try {
@@ -1505,10 +1556,10 @@
                     newImagePreview.style.display = 'none';
                 }
             });
-
+    
             document.getElementById('save-product').addEventListener('click', async () => {
                 if (!currentEditProduct) return;
-
+    
                 const updatedProduct = {
                     name: document.getElementById('edit-name').value.trim(),
                     description: document.getElementById('edit-description').value.trim(),
@@ -1516,12 +1567,12 @@
                     category: document.getElementById('edit-category').value.trim(),
                     stock: parseInt(document.getElementById('edit-stock').value) || 0
                 };
-
+    
                 if (!updatedProduct.name || isNaN(updatedProduct.price) || !updatedProduct.category) {
                     showNotification('Nombre, precio y categoría son obligatorios', 'error');
                     return;
                 }
-
+    
                 const imageUrl = document.getElementById('edit-image').value.trim();
                 if (editImageFileInput.files && editImageFileInput.files[0]) {
                     try {
@@ -1537,14 +1588,14 @@
                 } else {
                     updatedProduct.image = defaultImage;
                 }
-
+    
                 const sizes = getSizesFromForm('edit');
-                if (Object.keys(sizes).length > 0) {
+                if (sizes.length > 0) {
                     updatedProduct.sizes = sizes;
                 } else {
-                    delete updatedProduct.sizes;
+                    updatedProduct.sizes = null;
                 }
-
+    
                 try {
                     console.log('Updating product:', currentEditProduct.id, 'New category:', updatedProduct.category);
                     await db.ref('products/' + currentEditProduct.id).update(updatedProduct);
@@ -1559,14 +1610,14 @@
                     showNotification('Error al actualizar producto', 'error');
                 }
             });
-
+    
             document.getElementById('delete-product').addEventListener('click', async () => {
                 if (!currentEditProduct) return;
                 if (!isAdmin) {
                     showNotification('Debes ser administrador para eliminar productos', 'error');
                     return;
                 }
-
+    
                 if (confirm('¿Está seguro de que desea eliminar este producto? Esta acción no se puede deshacer.')) {
                     try {
                         console.log('Eliminando producto:', currentEditProduct.id);
@@ -1588,18 +1639,18 @@
                     }
                 }
             });
-
+    
             document.getElementById('cancel-edit').addEventListener('click', () => {
                 editProductModal.style.display = 'none';
                 editImageFileInput.value = '';
                 editImagePreview.style.display = 'none';
             });
-
+    
             document.getElementById('add-size-button').addEventListener('click', () => {
                 const sizesContainer = document.getElementById('edit-sizes-container');
                 addSizeField(sizesContainer);
             });
-
+    
             if (addNewProductButton) {
                 addNewProductButton.addEventListener('click', () => {
                     document.getElementById('new-name').value = '';
@@ -1617,12 +1668,12 @@
                     newProductModal.style.display = 'block';
                 });
             }
-
+    
             document.getElementById('add-new-size-button').addEventListener('click', () => {
                 const sizesContainer = document.getElementById('new-sizes-container');
                 addSizeField(sizesContainer);
             });
-
+    
             document.getElementById('create-product').addEventListener('click', async () => {
                 const newProduct = {
                     name: document.getElementById('new-name').value.trim(),
@@ -1632,12 +1683,12 @@
                     stock: parseInt(document.getElementById('new-stock').value) || 0,
                     createdAt: firebase.database.ServerValue.TIMESTAMP
                 };
-
+    
                 if (!newProduct.name || isNaN(newProduct.price) || !newProduct.category) {
                     showNotification('Nombre, precio y categoría son obligatorios', 'error');
                     return;
                 }
-
+    
                 const imageUrl = document.getElementById('new-image').value.trim();
                 if (newImageFileInput.files && newImageFileInput.files[0]) {
                     try {
@@ -1651,12 +1702,12 @@
                 } else {
                     newProduct.image = defaultImage;
                 }
-
+    
                 const sizes = getSizesFromForm('new');
-                if (Object.keys(sizes).length > 0) {
+                if (sizes.length > 0) {
                     newProduct.sizes = sizes;
                 }
-
+    
                 try {
                     const newProductKey = db.ref().child('products').push().key;
                     await db.ref('products/' + newProductKey).set(newProduct);
@@ -1671,13 +1722,13 @@
                     showNotification('Error al crear producto', 'error');
                 }
             });
-
+    
             document.getElementById('cancel-new').addEventListener('click', () => {
                 newProductModal.style.display = 'none';
                 newImageFileInput.value = '';
                 newImagePreview.style.display = 'none';
             });
-
+    
             window.addEventListener('click', (event) => {
                 if (event.target === loginModal) {
                     loginModal.style.display = 'none';
@@ -1697,7 +1748,10 @@
                     document.getElementById('add-to-cart-image').style.display = 'none';
                 }
             });
-
+    
+            // Add event listener for "Load More" button
+            loadMoreButton.addEventListener('click', loadMoreProducts);
+    
             checkAuth();
             updateCartCount();
         });
