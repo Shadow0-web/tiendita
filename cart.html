@@ -101,16 +101,12 @@
             font-weight: 600;
             background: #f3f4f6;
         }
-        .cart-table select,
         .cart-table input[type="number"] {
             padding: 0.25rem;
             border: 1px solid #d1d5db;
             border-radius: 0.375rem;
             background: #fff;
             font-size: 0.875rem;
-            width: 100%;
-        }
-        .cart-table input[type="number"] {
             width: 4rem;
         }
         .cart-table .remove-button {
@@ -173,6 +169,8 @@
             color: white;
             z-index: 1000;
             font-size: 0.875rem;
+            max-width: 90%;
+            text-align: center;
         }
         .notification.success { background-color: #00a680; }
         .notification.error { background-color: #d82c2cc7; }
@@ -285,6 +283,7 @@
             const cartTotalElement = document.getElementById('cart-total');
             const cartCountElement = document.querySelector('.cart-count');
             const checkoutButton = document.getElementById('checkout-button');
+            const defaultImage = 'logo.png';
 
             function showNotification(message, type = 'success') {
                 const notification = document.createElement('div');
@@ -353,61 +352,39 @@
                         continue;
                     }
 
-                    const hasSizes = productData.sizes && Object.keys(productData.sizes).length > 0;
-                    let isValidItem = true;
+                    const hasSizes = productData.sizes && Array.isArray(productData.sizes) && productData.sizes.length > 0;
+                    const stock = productData.stock || 0;
 
-                    // Validate size and stock
-                    if (hasSizes && item.size) {
-                        if (!productData.sizes[item.size] || productData.sizes[item.size] <= 0) {
-                            delete cart[key];
-                            cartUpdated = true;
-                            showNotification(`Talla ${item.size} de ${item.name} ya no está disponible`, 'error');
-                            continue;
-                        }
-                        if (item.quantity > productData.sizes[item.size]) {
-                            cart[key].quantity = productData.sizes[item.size];
-                            cartUpdated = true;
-                            showNotification(`Cantidad ajustada para ${item.name} talla ${item.size} debido a stock`, 'error');
-                        }
-                    } else if (!hasSizes && item.size) {
-                        // Item has a size but product no longer has sizes
+                    // Validate size
+                    if (hasSizes && item.size && !productData.sizes.includes(item.size)) {
                         delete cart[key];
                         cartUpdated = true;
-                        showNotification(`El producto ${item.name} ya no usa tallas`, 'error');
+                        showNotification(`Talla ${item.size} de ${item.name} ya no está disponible`, 'error');
                         continue;
-                    } else if (!hasSizes) {
-                        if (item.quantity > productData.stock) {
-                            cart[key].quantity = productData.stock;
-                            cartUpdated = true;
-                            showNotification(`Cantidad ajustada para ${item.name} debido a stock`, 'error');
-                        }
-                        if (productData.stock <= 0) {
-                            delete cart[key];
-                            cartUpdated = true;
-                            showNotification(`El producto ${item.name} ya no está disponible`, 'error');
-                            continue;
-                        }
                     }
 
-                    if (!isValidItem) continue;
-
-                    // Generate size options for dropdown
-                    let sizeOptions = '';
-                    if (hasSizes) {
-                        sizeOptions = Object.keys(productData.sizes)
-                            .map(size => `<option value="${size}" ${size === item.size ? 'selected' : ''} ${productData.sizes[size] <= 0 ? 'disabled' : ''}>${size} (${productData.sizes[size]} disponibles)</option>`)
-                            .join('');
+                    // Validate stock
+                    if (item.quantity > stock) {
+                        cart[key].quantity = stock;
+                        cartUpdated = true;
+                        showNotification(`Cantidad ajustada para ${item.name} debido a stock`, 'error');
+                    }
+                    if (stock <= 0) {
+                        delete cart[key];
+                        cartUpdated = true;
+                        showNotification(`El producto ${item.name} ya no está disponible`, 'error');
+                        continue;
                     }
 
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td class="product-cell">
-                            <div class="product-image"><img src="${item.image || 'https://via.placeholder.com/150'}" alt="${item.name}"></div>
+                            <div class="product-image"><img src="${item.image || defaultImage}" alt="${item.name}" onerror="this.src='${defaultImage}'"></div>
                             <span>${item.name}</span>
                         </td>
                         <td>$${parseFloat(item.price).toFixed(2)}</td>
                         <td><input type="number" class="quantity-input" data-key="${key}" value="${item.quantity}" min="1"></td>
-                        <td>${hasSizes ? `<select class="size-select" data-key="${key}">${sizeOptions}</select>` : item.size || 'N/A'}</td>
+                        <td>${item.size || 'N/A'}</td>
                         <td><button class="remove-button" data-key="${key}">Eliminar</button></td>
                     `;
                     cartItemsContainer.appendChild(row);
@@ -421,42 +398,6 @@
 
                 cartTotalElement.textContent = `Total: $${total.toFixed(2)}`;
                 cartCountElement.textContent = itemCount;
-
-                // Evento para cambiar talla
-                document.querySelectorAll('.size-select').forEach(select => {
-                    select.addEventListener('change', async (e) => {
-                        const key = e.target.dataset.key;
-                        const newSize = e.target.value;
-                        const cart = getCart();
-                        const item = cart[key];
-                        const productData = await getProductData(item.id);
-
-                        if (!productData || !productData.sizes || !productData.sizes[newSize] || productData.sizes[newSize] <= 0) {
-                            showNotification('Talla no disponible', 'error');
-                            e.target.value = item.size;
-                            return;
-                        }
-
-                        const newKey = `${item.id}_${newSize}`;
-                        if (newKey !== key && cart[newKey]) {
-                            showNotification('Este producto con esta talla ya está en el carrito', 'error');
-                            e.target.value = item.size;
-                            return;
-                        }
-
-                        if (item.quantity > productData.sizes[newSize]) {
-                            showNotification(`No hay suficiente stock para talla ${newSize} (máximo: ${productData.sizes[newSize]})`, 'error');
-                            e.target.value = item.size;
-                            return;
-                        }
-
-                        cart[newKey] = { ...item, size: newSize };
-                        delete cart[key];
-                        saveCart(cart);
-                        renderCart();
-                        showNotification('Talla actualizada', 'success');
-                    });
-                });
 
                 // Evento para cambiar cantidad
                 document.querySelectorAll('.quantity-input').forEach(input => {
@@ -476,13 +417,7 @@
                             return;
                         }
 
-                        let maxQuantity;
-                        if (item.size && productData.sizes && productData.sizes[item.size]) {
-                            maxQuantity = productData.sizes[item.size];
-                        } else {
-                            maxQuantity = productData.stock || 0;
-                        }
-
+                        const maxQuantity = productData.stock || 0;
                         if (quantity > maxQuantity) {
                             showNotification(`No hay suficiente stock (máximo: ${maxQuantity})`, 'error');
                             e.target.value = item.quantity;
