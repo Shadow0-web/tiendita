@@ -521,7 +521,7 @@
                 align-self: flex-end;
             }
         }
-        #add-new-product {
+        .admin-button {
             margin: 1rem 0;
             padding: 0.75rem 1rem;
             background: #4CAF50;
@@ -533,7 +533,7 @@
             align-items: center;
             gap: 0.5rem;
         }
-        #add-new-product:hover {
+        .admin-button:hover {
             background: #45a049;
         }
         .size-item {
@@ -655,13 +655,80 @@
             color: #fff;
             border-color: #00a680;
         }
+
+        .orders-section {
+    padding: 1rem 0;
+    display: none;
+}
+.orders-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+.orders-table th,
+.orders-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+.orders-table th {
+    font-weight: 600;
+    background: #f3f4f6;
+}
+.complete-button, .delete-order-button {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    margin-right: 0.5rem;
+    border: none;
+}
+.complete-button {
+    background: #00a680;
+    color: #fff;
+}
+.complete-button:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+}
+.delete-order-button {
+    background: #d82c2cc7;
+    color: #fff;
+}
+        .orders-table .details-button {
+            padding: 0.25rem 0.5rem;
+            border: 1px solid #00a680;
+            color: #00a680;
+            border-radius: 0.375rem;
+            background: none;
+            font-size: 0.875rem;
+        }
+        .order-details {
+            margin-bottom: 1rem;
+        }
+        .order-details p {
+            margin-bottom: 0.5rem;
+        }
+        .order-details ul {
+            list-style: none;
+            margin-bottom: 1rem;
+        }
+        .order-details ul li {
+            margin-bottom: 0.25rem;
+        }
     </style>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-26L0PNTLJ2"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-    
       gtag('config', 'G-26L0PNTLJ2');
     </script>
 </head>
@@ -738,16 +805,42 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
                 Añadir Nuevo Producto
             </button>
+            <button id="view-orders" class="admin-button" style="display: none;" aria-label="Ver pedidos">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                Ver Pedidos
+            </button>
             <div id="stock-filter" style="display: none; margin-top: 0.5rem;">
                 <button id="show-stock" class="secondary-button active" aria-label="Mostrar productos con stock">Stock</button>
                 <button id="show-no-stock" class="secondary-button" aria-label="Mostrar productos sin stock">No Stock</button>
             </div>
         </div>
-        <div class="products-section">
+        <div class="products-section" id="products-section">
             <div class="products-grid" id="products-grid"></div>
             <div class="load-more-products">
                 <button id="load-more-products" aria-label="Cargar más productos"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Cargar más</button>
             </div>
+        </div>
+
+        <div class="orders-section" id="orders-section">
+            <h1 class="orders-title">Pedidos Recibidos</h1>
+            <div class="search-container" style="margin-bottom: 1rem;">
+                <input type="text" class="search-input" id="order-search-input" placeholder="Buscar pedidos por cliente, correo o teléfono" aria-label="Buscar pedidos">
+                <button class="search-button" aria-label="Buscar pedidos">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+                </button>
+            </div>
+            <table class="orders-table" id="orders-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Teléfono</th>
+                        <th>Total</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-items"></tbody>
+            </table>
         </div>
     </main>
     <footer>
@@ -760,6 +853,7 @@
             </div>
         </div>
     </footer>
+
     <div class="modal" id="login-modal">
         <div class="modal-content">
             <h2>Iniciar Sesión</h2>
@@ -824,6 +918,7 @@
             </div>
         </div>
     </div>
+    
     <div class="modal" id="new-product-modal">
         <div class="modal-content">
             <h2>Nuevo Producto</h2>
@@ -896,6 +991,15 @@
             </div>
         </div>
     </div>
+    <div class="modal" id="order-details-modal">
+        <div class="modal-content">
+            <h2>Detalles del Pedido</h2>
+            <div class="order-details" id="order-details"></div>
+            <div class="form-actions">
+                <button class="cancel" id="close-details" aria-label="Cerrar">Cerrar</button>
+            </div>
+        </div>
+    </div>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-26L0PNTLJ2"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -908,33 +1012,33 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
     <script>
-        let db = null;
+let db = null;
 
-        if (typeof firebase === 'undefined') {
-            console.error('Firebase SDK no cargado.');
-            alert('Error: Firebase SDK no cargado.');
-        } else {
-            const firebaseConfig = {
-                apiKey: "AIzaSyDLQvc4QbYLbIWLERg8LC_QZlGpEd5mtK0",
-                authDomain: "sonya-c88bc.firebaseapp.com",
-                databaseURL: "https://sonya-c88bc-default-rtdb.firebaseio.com",
-                projectId: "sonya-c88bc",
-                storageBucket: "sonya-c88bc.appspot.com",
-                messagingSenderId: "1078869575645",
-                appId: "1:1078869575645:web:222a93490168335da91834",
-                measurementId: "G-2FM9KJ8MN9"
-            };
-            try {
-                firebase.initializeApp(firebaseConfig);
-                db = firebase.database();
-                console.log('Firebase inicializado correctamente');
-            } catch (error) {
-                console.error('Error inicializando Firebase:', error);
-                alert('Error inicializando Firebase.');
-            }
-        }
+if (typeof firebase === 'undefined') {
+    console.error('Firebase SDK no cargado.');
+    alert('Error: Firebase SDK no cargado.');
+} else {
+    const firebaseConfig = {
+        apiKey: "AIzaSyDLQvc4QbYLbIWLERg8LC_QZlGpEd5mtK0",
+        authDomain: "sonya-c88bc.firebaseapp.com",
+        databaseURL: "https://sonya-c88bc-default-rtdb.firebaseio.com",
+        projectId: "sonya-c88bc",
+        storageBucket: "sonya-c88bc.appspot.com",
+        messagingSenderId: "1078869575645",
+        appId: "1:1078869575645:web:222a93490168335da91834",
+        measurementId: "G-2FM9KJ8MN9"
+    };
+    try {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.database();
+        console.log('Firebase inicializado correctamente');
+    } catch (error) {
+        console.error('Error inicializando Firebase:', error);
+        alert('Error inicializando Firebase.');
+    }
+}
 
-        document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
     const productsGrid = document.getElementById('products-grid');
     const loginButton = document.getElementById('login-button');
     const logoutButton = document.getElementById('logout-button');
@@ -944,6 +1048,7 @@
     const addToCartModal = document.getElementById('add-to-cart-modal');
     const cartCountElement = document.querySelector('.cart-count');
     const addNewProductButton = document.getElementById('add-new-product');
+    const viewOrdersButton = document.getElementById('view-orders');
     const categoriesList = document.getElementById('categories-list');
     const addCategoryButton = document.getElementById('add-category');
     const editImageFileInput = document.getElementById('edit-image-file');
@@ -956,6 +1061,11 @@
     const stockFilterContainer = document.getElementById('stock-filter');
     const searchInput = document.getElementById('search-input');
     const mobileSearchInput = document.getElementById('mobile-search-input');
+    const orderSearchInput = document.getElementById('order-search-input');
+    const productsSection = document.getElementById('products-section');
+    const ordersSection = document.getElementById('orders-section');
+    const ordersItemsContainer = document.getElementById('orders-items');
+    const reloadButton = document.getElementById('reload-button');
 
     let isAdmin = false;
     let currentEditProduct = null;
@@ -966,6 +1076,7 @@
     let displayedProducts = 0;
     const productsPerPage = 15;
     let allProducts = [];
+    let allOrders = [];
 
     // Función de debounce
     function debounce(func, wait) {
@@ -980,11 +1091,17 @@
         };
     }
 
-    // Función para manejar la búsqueda
+    // Función para manejar la búsqueda de productos
     function handleSearch() {
         const searchTerm = (searchInput.value || mobileSearchInput.value).trim().toLowerCase();
         displayedProducts = 0;
         loadProducts(searchTerm);
+    }
+
+    // Función para manejar la búsqueda de pedidos
+    function handleOrderSearch() {
+        const searchTerm = orderSearchInput.value.trim().toLowerCase();
+        loadOrders(searchTerm);
     }
 
     // Event listeners para búsqueda con debounce
@@ -997,6 +1114,11 @@
         searchInput.value = '';
         debouncedHandleSearch();
     });
+
+    if (orderSearchInput) {
+        const debouncedHandleOrderSearch = debounce(handleOrderSearch, 300);
+        orderSearchInput.addEventListener('input', debouncedHandleOrderSearch);
+    }
 
     function normalizeCategory(category) {
         return category ? category.trim().toLowerCase().replace('×', '') : '';
@@ -1059,11 +1181,18 @@
         loginButton.style.display = isAdmin ? 'none' : 'block';
         logoutButton.style.display = isAdmin ? 'block' : 'none';
         addNewProductButton.style.display = isAdmin ? 'block' : 'none';
+        viewOrdersButton.style.display = isAdmin ? 'block' : 'none';
         addCategoryButton.style.display = isAdmin ? 'block' : 'none';
         stockFilterContainer.style.display = isAdmin ? 'flex' : 'none';
         updateStockFilterButtons();
         loadCategories();
         loadProducts();
+        if (isAdmin) {
+            loadOrders();
+        } else {
+            ordersSection.style.display = 'none';
+            productsSection.style.display = 'block';
+        }
     }
 
     function updateStockFilterButtons() {
@@ -1247,7 +1376,7 @@
         }
     }
 
-    function updateCategorySelects() {
+    async function updateCategorySelects() {
         const editSelect = document.getElementById('edit-category');
         const newSelect = document.getElementById('new-category');
         editSelect.innerHTML = '<option value="" disabled selected>Seleccione una categoría</option>';
@@ -1476,6 +1605,161 @@
         }
     }
 
+    async function completeOrder(orderId) {
+        if (!isAdmin) {
+            showNotification('Debes ser administrador para completar pedidos', 'error');
+            return;
+        }
+
+        try {
+            const orderRef = db.ref('orders/' + orderId);
+            const orderSnapshot = await orderRef.once('value');
+            const order = orderSnapshot.val();
+
+            if (!order) {
+                showNotification('El pedido no existe', 'error');
+                return;
+            }
+
+            if (order.completed) {
+                showNotification('El pedido ya está completado', 'error');
+                return;
+            }
+
+            // Verificar stock suficiente
+            const productsSnapshot = await db.ref('products').once('value');
+            const products = productsSnapshot.val() || {};
+            let insufficientStock = false;
+            const stockUpdates = {};
+
+            for (const item of order.cart) {
+                const product = products[item.id];
+                if (!product) {
+                    showNotification(`El producto ${item.name} no existe`, 'error');
+                    return;
+                }
+                const currentStock = product.stock || 0;
+                const requiredQuantity = item.quantity || 1;
+                if (currentStock < requiredQuantity) {
+                    insufficientStock = true;
+                    showNotification(`Stock insuficiente para ${item.name} (Disponible: ${currentStock}, Requerido: ${requiredQuantity})`, 'error');
+                    return;
+                }
+                stockUpdates[item.id] = currentStock - requiredQuantity;
+            }
+
+            if (!insufficientStock) {
+                // Actualizar stock de productos
+                for (const [productId, newStock] of Object.entries(stockUpdates)) {
+                    await db.ref('products/' + productId).update({ stock: newStock });
+                }
+
+                // Marcar pedido como completado
+                await orderRef.update({ completed: true });
+
+                showNotification('Pedido completado exitosamente');
+                loadOrders();
+            }
+        } catch (error) {
+            console.error('Error completando pedido:', error);
+            showNotification('Error al completar el pedido', 'error');
+        }
+    }
+
+    async function deleteOrder(orderId) {
+        if (!isAdmin) {
+            showNotification('Debes ser administrador para eliminar pedidos', 'error');
+            return;
+        }
+
+        if (confirm('¿Está seguro de que desea eliminar este pedido?')) {
+            try {
+                await db.ref('orders/' + orderId).remove();
+                showNotification('Pedido eliminado exitosamente');
+                loadOrders();
+            } catch (error) {
+                console.error('Error eliminando pedido:', error);
+                showNotification('Error al eliminar el pedido', 'error');
+            }
+        }
+    }
+
+    async function loadOrders(searchTerm = '') {
+        if (!db) {
+            console.error('Base de datos no inicializada');
+            showNotification('Error: Base de datos no disponible', 'error');
+            return;
+        }
+
+        if (!isAdmin) {
+            showNotification('Debes ser administrador para ver pedidos', 'error');
+            return;
+        }
+
+        try {
+            const snapshot = await db.ref('orders').once('value');
+            ordersItemsContainer.innerHTML = '';
+            allOrders = [];
+
+            if (snapshot.exists()) {
+                const orders = snapshot.val();
+                Object.entries(orders).forEach(([orderId, order]) => {
+                    allOrders.push({ id: orderId, ...order });
+                });
+
+                const filteredOrders = allOrders.filter(order => {
+                    const searchMatch = searchTerm
+                        ? order.name.toLowerCase().includes(searchTerm) ||
+                          order.email.toLowerCase().includes(searchTerm) ||
+                          order.phone.toLowerCase().includes(searchTerm)
+                        : true;
+                    return searchMatch;
+                });
+
+                if (filteredOrders.length === 0) {
+                    ordersItemsContainer.innerHTML = `<tr><td colspan="5">No se encontraron pedidos ${searchTerm ? 'que coincidan con la búsqueda' : 'registrados'}.</td></tr>`;
+                    return;
+                }
+
+                filteredOrders.forEach(order => {
+                    const date = new Date(order.createdAt).toLocaleString('es-EC');
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${date}</td>
+                        <td>${order.name}</td>
+                        <td>${order.phone}</td>
+                        <td>$${order.total.toFixed(2)}</td>
+                        <td>
+                            <button class="complete-button" data-id="${order.id}" ${order.completed ? 'disabled' : ''}>Completado</button>
+                            <button class="delete-order-button" data-id="${order.id}">Eliminar</button>
+                        </td>
+                    `;
+                    ordersItemsContainer.appendChild(row);
+                });
+
+                // Agregar event listeners para los botones
+                document.querySelectorAll('.complete-button').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const orderId = button.dataset.id;
+                        completeOrder(orderId);
+                    });
+                });
+
+                document.querySelectorAll('.delete-order-button').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const orderId = button.dataset.id;
+                        deleteOrder(orderId);
+                    });
+                });
+            } else {
+                ordersItemsContainer.innerHTML = '<tr><td colspan="5">No hay pedidos registrados.</td></tr>';
+            }
+        } catch (error) {
+            console.error('Error cargando pedidos:', error);
+            showNotification('No tienes permiso para acceder a los pedidos', 'error');
+        }
+    }
+
     loginButton.addEventListener('click', () => loginModal.style.display = 'block');
 
     document.getElementById('submit-login').addEventListener('click', async () => {
@@ -1495,6 +1779,7 @@
             loginButton.style.display = 'none';
             logoutButton.style.display = 'block';
             addNewProductButton.style.display = 'block';
+            viewOrdersButton.style.display = 'block';
             addCategoryButton.style.display = 'block';
             stockFilterContainer.style.display = 'flex';
             stockFilter = 'stock';
@@ -1502,9 +1787,14 @@
             showNotification('Inicio de sesión exitoso');
             loadCategories();
             loadProducts();
+            loadOrders();
         } else {
             showNotification('Credenciales incorrectas', 'error');
         }
+    });
+
+    document.getElementById('cancel-login').addEventListener('click', () => {
+        loginModal.style.display = 'none';
     });
 
     logoutButton.addEventListener('click', () => {
@@ -1513,140 +1803,134 @@
         loginButton.style.display = 'block';
         logoutButton.style.display = 'none';
         addNewProductButton.style.display = 'none';
+        viewOrdersButton.style.display = 'none';
         addCategoryButton.style.display = 'none';
         stockFilterContainer.style.display = 'none';
         stockFilter = 'stock';
+        ordersSection.style.display = 'none';
+        productsSection.style.display = 'block';
+        if (orderSearchInput) orderSearchInput.value = '';
         showNotification('Sesión cerrada');
         loadCategories();
         loadProducts();
     });
 
-    document.getElementById('confirm-add-to-cart').addEventListener('click', () => {
-        if (!currentAddToCartProduct) return;
-
-        const cart = JSON.parse(localStorage.getItem('cart') || '{}');
-        const stockAmount = currentAddToCartProduct.stock || 0;
-        const hasSizes = currentAddToCartProduct.sizes && Array.isArray(currentAddToCartProduct.sizes) && currentAddToCartProduct.sizes.length > 0;
-        let selectedSize = '';
-
-        if (stockAmount < 1) {
-            showNotification('No hay stock disponible', 'error');
+    viewOrdersButton.addEventListener('click', () => {
+        if (!isAdmin) {
+            showNotification('Debes ser administrador para ver pedidos', 'error');
             return;
         }
-
-        if (hasSizes) {
-            const sizeItems = document.querySelectorAll('#add-to-cart-sizes .size-item');
-            let selectedCount = 0;
-            sizeItems.forEach(item => {
-                const checkbox = item.querySelector('.size-checkbox');
-                if (checkbox.checked) {
-                    selectedSize = checkbox.dataset.size;
-                    selectedCount++;
-                }
-            });
-            if (selectedCount !== 1) {
-                showNotification('Selecciona exactamente una talla', 'error');
-                return;
-            }
-        }
-
-        const productKey = hasSizes ? `${currentAddToCartProduct.id}_${selectedSize}` : currentAddToCartProduct.id;
-        if (cart[productKey]) {
-            cart[productKey].quantity = 1;
-        } else {
-            cart[productKey] = {
-                id: currentAddToCartProduct.id,
-                name: currentAddToCartProduct.name,
-                price: currentAddToCartProduct.price,
-                image: currentAddToCartProduct.image || defaultImage,
-                size: selectedSize,
-                quantity: 1
-            };
-        }
-
-        localStorage.setItem('cart', JSON.stringify(cart));
-        updateCartCount();
-        addToCartModal.style.display = 'none';
-        showNotification('Artículo agregado al carrito');
+        productsSection.style.display = 'none';
+        ordersSection.style.display = 'block';
+        if (orderSearchInput) orderSearchInput.value = '';
+        loadOrders();
+        viewOrdersButton.style.display = 'none';
+        addNewProductButton.style.display = 'block';
+        stockFilterContainer.style.display = 'none';
     });
 
-    document.getElementById('cancel-add-to-cart').addEventListener('click', () => {
-        addToCartModal.style.display = 'none';
-        document.getElementById('add-to-cart-image').style.display = 'none';
+    addNewProductButton.addEventListener('click', () => {
+        if (!isAdmin) {
+            showNotification('Debes ser administrador para añadir productos', 'error');
+            return;
+        }
+        ordersSection.style.display = 'none';
+        productsSection.style.display = 'block';
+        viewOrdersButton.style.display = 'block';
+        stockFilterContainer.style.display = 'flex';
+        document.getElementById('new-name').value = '';
+        document.getElementById('new-description').value = '';
+        document.getElementById('new-price').value = '';
+        document.getElementById('new-image').value = '';
+        document.getElementById('new-image-file').value = '';
+        document.getElementById('new-category').value = '';
+        document.getElementById('new-stock').value = '0';
+        newImagePreview.src = '';
+        newImagePreview.style.display = 'none';
+        const sizesContainer = document.getElementById('new-sizes-container');
+        sizesContainer.innerHTML = '';
+        addSizeField(sizesContainer);
+        newProductModal.style.display = 'block';
+    });
+
+    document.getElementById('add-size-button').addEventListener('click', () => {
+        addSizeField(document.getElementById('edit-sizes-container'));
+    });
+
+    document.getElementById('add-new-size-button').addEventListener('click', () => {
+        addSizeField(document.getElementById('new-sizes-container'));
     });
 
     editImageFileInput.addEventListener('change', async () => {
         if (editImageFileInput.files && editImageFileInput.files[0]) {
             try {
-                const base64 = await getBase64(editImageFileInput.files[0]);
-                editImagePreview.src = base64;
+                const base64Image = await getBase64(editImageFileInput.files[0]);
+                editImagePreview.src = base64Image;
                 editImagePreview.style.display = 'block';
+                document.getElementById('edit-image').value = '';
             } catch (error) {
+                console.error('Error al cargar imagen:', error);
                 showNotification('Error al cargar la imagen', 'error');
             }
-        } else {
-            editImagePreview.style.display = 'none';
         }
     });
 
     newImageFileInput.addEventListener('change', async () => {
         if (newImageFileInput.files && newImageFileInput.files[0]) {
             try {
-                const base64 = await getBase64(newImageFileInput.files[0]);
-                newImagePreview.src = base64;
+                const base64Image = await getBase64(newImageFileInput.files[0]);
+                newImagePreview.src = base64Image;
                 newImagePreview.style.display = 'block';
+                document.getElementById('new-image').value = '';
             } catch (error) {
+                console.error('Error al cargar imagen:', error);
                 showNotification('Error al cargar la imagen', 'error');
             }
-        } else {
-            newImagePreview.style.display = 'none';
         }
     });
 
     document.getElementById('save-product').addEventListener('click', async () => {
-        if (!currentEditProduct) return;
-
-        const updatedProduct = {
-            name: document.getElementById('edit-name').value.trim(),
-            description: document.getElementById('edit-description').value.trim(),
-            price: parseFloat(document.getElementById('edit-price').value),
-            category: document.getElementById('edit-category').value.trim(),
-            stock: parseInt(document.getElementById('edit-stock').value) || 0
-        };
-
-        if (!updatedProduct.name || isNaN(updatedProduct.price) || !updatedProduct.category) {
-            showNotification('Nombre, precio y categoría son obligatorios', 'error');
+        if (!isAdmin) {
+            showNotification('Debes ser administrador para editar productos', 'error');
             return;
         }
 
+        const name = document.getElementById('edit-name').value.trim();
+        const description = document.getElementById('edit-description').value.trim();
+        const price = parseFloat(document.getElementById('edit-price').value);
+        const imageFile = editImageFileInput.files[0];
         const imageUrl = document.getElementById('edit-image').value.trim();
-        if (editImageFileInput.files && editImageFileInput.files[0]) {
-            try {
-                updatedProduct.image = await getBase64(editImageFileInput.files[0]);
-            } catch (error) {
-                showNotification('Error al procesar la imagen', 'error');
-                return;
-            }
-        } else if (imageUrl) {
-            updatedProduct.image = imageUrl;
-        } else if (currentEditProduct.image) {
-            updatedProduct.image = currentEditProduct.image;
-        } else {
-            updatedProduct.image = defaultImage;
-        }
-
+        const category = document.getElementById('edit-category').value;
+        const stock = parseInt(document.getElementById('edit-stock').value);
         const sizes = getSizesFromForm('edit');
-        if (sizes.length > 0) {
-            updatedProduct.sizes = sizes;
-        } else {
-            updatedProduct.sizes = null;
+
+        if (!name || isNaN(price) || price <= 0 || !category) {
+            showNotification('Completa todos los campos requeridos', 'error');
+            return;
         }
 
         try {
-            await db.ref('products/' + currentEditProduct.id).update(updatedProduct);
+            let image = currentEditProduct.image || defaultImage;
+            if (imageFile) {
+                image = await getBase64(imageFile);
+            } else if (imageUrl) {
+                image = imageUrl;
+            }
+
+            const productData = {
+                name,
+                description,
+                price,
+                image,
+                category,
+                stock,
+                sizes
+            };
+
+            await db.ref('products/' + currentEditProduct.id).update(productData);
+            showNotification('Producto actualizado exitosamente');
             editProductModal.style.display = 'none';
-            showNotification('Producto actualizado');
-            setActiveCategory(updatedProduct.category);
+            loadProducts();
         } catch (error) {
             console.error('Error actualizando producto:', error);
             showNotification('Error al actualizar producto', 'error');
@@ -1654,21 +1938,17 @@
     });
 
     document.getElementById('delete-product').addEventListener('click', async () => {
-        if (!currentEditProduct) return;
         if (!isAdmin) {
             showNotification('Debes ser administrador para eliminar productos', 'error');
             return;
         }
 
-        if (confirm('¿Está seguro de que desea eliminar este producto? Esta acción no se puede deshacer.')) {
+        if (confirm('¿Está seguro de que desea eliminar este producto?')) {
             try {
                 await db.ref('products/' + currentEditProduct.id).remove();
                 const wasInCart = cleanCart(currentEditProduct.id);
+                showNotification(`Producto eliminado exitosamente${wasInCart ? ' y removido del carrito' : ''}`);
                 editProductModal.style.display = 'none';
-                showNotification('Producto eliminado exitosamente');
-                if (wasInCart) {
-                    showNotification('El producto ha sido removido de tu carrito');
-                }
                 loadProducts();
             } catch (error) {
                 console.error('Error eliminando producto:', error);
@@ -1679,78 +1959,50 @@
 
     document.getElementById('cancel-edit').addEventListener('click', () => {
         editProductModal.style.display = 'none';
-        editImageFileInput.value = '';
-        editImagePreview.style.display = 'none';
-    });
-
-    document.getElementById('add-size-button').addEventListener('click', () => {
-        const sizesContainer = document.getElementById('edit-sizes-container');
-        addSizeField(sizesContainer);
-    });
-
-    if (addNewProductButton) {
-        addNewProductButton.addEventListener('click', () => {
-            document.getElementById('new-name').value = '';
-            document.getElementById('new-description').value = '';
-            document.getElementById('new-price').value = '';
-            document.getElementById('new-image').value = '';
-            document.getElementById('new-image-file').value = '';
-            document.getElementById('new-category').value = '';
-            document.getElementById('new-stock').value = '0';
-            newImagePreview.src = '';
-            newImagePreview.style.display = 'none';
-            const sizesContainer = document.getElementById('new-sizes-container');
-            sizesContainer.innerHTML = '';
-            addSizeField(sizesContainer);
-            newProductModal.style.display = 'block';
-        });
-    }
-
-    document.getElementById('add-new-size-button').addEventListener('click', () => {
-        const sizesContainer = document.getElementById('new-sizes-container');
-        addSizeField(sizesContainer);
     });
 
     document.getElementById('create-product').addEventListener('click', async () => {
-        const newProduct = {
-            name: document.getElementById('new-name').value.trim(),
-            description: document.getElementById('new-description').value.trim(),
-            price: parseFloat(document.getElementById('new-price').value),
-            category: document.getElementById('new-category').value.trim(),
-            stock: parseInt(document.getElementById('new-stock').value) || 0,
-            createdAt: firebase.database.ServerValue.TIMESTAMP
-        };
-
-        if (!newProduct.name || isNaN(newProduct.price) || !newProduct.category) {
-            showNotification('Nombre, precio y categoría son obligatorios', 'error');
+        if (!isAdmin) {
+            showNotification('Debes ser administrador para crear productos', 'error');
             return;
         }
 
+        const name = document.getElementById('new-name').value.trim();
+        const description = document.getElementById('new-description').value.trim();
+        const price = parseFloat(document.getElementById('new-price').value);
+        const imageFile = newImageFileInput.files[0];
         const imageUrl = document.getElementById('new-image').value.trim();
-        if (newImageFileInput.files && newImageFileInput.files[0]) {
-            try {
-                newProduct.image = await getBase64(newImageFileInput.files[0]);
-            } catch (error) {
-                showNotification('Error al procesar la imagen', 'error');
-                return;
-            }
-        } else if (imageUrl) {
-            newProduct.image = imageUrl;
-        } else {
-            newProduct.image = defaultImage;
-        }
-
+        const category = document.getElementById('new-category').value;
+        const stock = parseInt(document.getElementById('new-stock').value);
         const sizes = getSizesFromForm('new');
-        if (sizes.length > 0) {
-            newProduct.sizes = sizes;
+
+        if (!name || isNaN(price) || price <= 0 || !category) {
+            showNotification('Completa todos los campos requeridos', 'error');
+            return;
         }
 
         try {
-            const newProductKey = db.ref().child('products').push().key;
-            await db.ref('products/' + newProductKey).set(newProduct);
-            newProductModal.style.display = 'none';
+            let image = defaultImage;
+            if (imageFile) {
+                image = await getBase64(imageFile);
+            } else if (imageUrl) {
+                image = imageUrl;
+            }
+
+            const productData = {
+                name,
+                description,
+                price,
+                image,
+                category,
+                stock,
+                sizes
+            };
+
+            await db.ref('products').push(productData);
             showNotification('Producto creado exitosamente');
-            setActiveCategory(newProduct.category);
+            newProductModal.style.display = 'none';
+            loadProducts();
         } catch (error) {
             console.error('Error creando producto:', error);
             showNotification('Error al crear producto', 'error');
@@ -1759,59 +2011,78 @@
 
     document.getElementById('cancel-new').addEventListener('click', () => {
         newProductModal.style.display = 'none';
-        newImageFileInput.value = '';
-        newImagePreview.style.display = 'none';
     });
 
-    if (showStockButton) {
-        showStockButton.addEventListener('click', () => {
-            if (!isAdmin) return;
-            stockFilter = 'stock';
-            updateStockFilterButtons();
-            displayedProducts = 0;
-            allProducts = [];
-            const searchTerm = (searchInput.value || mobileSearchInput.value).trim().toLowerCase();
-            loadProducts(searchTerm);
-        });
-    }
+    document.getElementById('confirm-add-to-cart').addEventListener('click', () => {
+        if (!currentAddToCartProduct) {
+            showNotification('No se ha seleccionado ningún producto', 'error');
+            return;
+        }
 
-    if (showNoStockButton) {
-        showNoStockButton.addEventListener('click', () => {
-            if (!isAdmin) return;
-            stockFilter = 'no-stock';
-            updateStockFilterButtons();
-            displayedProducts = 0;
-            allProducts = [];
-            const searchTerm = (searchInput.value || mobileSearchInput.value).trim().toLowerCase();
-            loadProducts(searchTerm);
-        });
-    }
-    
-    document.getElementById('reload-button').addEventListener('click', () => {
-    window.location.reload();
-});
+        const sizesContainer = document.getElementById('add-to-cart-sizes');
+        const selectedSize = sizesContainer.querySelector('.size-checkbox:checked');
+        const hasSizes = currentAddToCartProduct.sizes && currentAddToCartProduct.sizes.length > 0;
 
-    window.addEventListener('click', (event) => {
-        if (event.target === loginModal) {
-            loginModal.style.display = 'none';
+        if (hasSizes && !selectedSize) {
+            showNotification('Por favor, selecciona una talla', 'error');
+            return;
         }
-        if (event.target === editProductModal) {
-            editProductModal.style.display = 'none';
-            editImageFileInput.value = '';
-            editImagePreview.style.display = 'none';
+
+        const size = selectedSize ? selectedSize.dataset.size : null;
+        const cart = JSON.parse(localStorage.getItem('cart') || '{}');
+        const cartKey = `${currentAddToCartProduct.id}_${size || 'no-size'}`;
+        const existingItem = cart[cartKey];
+
+        if (existingItem) {
+            existingItem.quantity += 1;
+        } else {
+            cart[cartKey] = {
+                id: currentAddToCartProduct.id,
+                name: currentAddToCartProduct.name,
+                price: currentAddToCartProduct.price,
+                image: currentAddToCartProduct.image || defaultImage,
+                size,
+                quantity: 1
+            };
         }
-        if (event.target === newProductModal) {
-            newProductModal.style.display = 'none';
-            newImageFileInput.value = '';
-            newImagePreview.style.display = 'none';
-        }
-        if (event.target === addToCartModal) {
-            addToCartModal.style.display = 'none';
-            document.getElementById('add-to-cart-image').style.display = 'none';
-        }
+
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        showNotification('Producto añadido al carrito');
+        addToCartModal.style.display = 'none';
+    });
+
+    document.getElementById('cancel-add-to-cart').addEventListener('click', () => {
+        addToCartModal.style.display = 'none';
+    });
+
+    showStockButton.addEventListener('click', () => {
+        stockFilter = 'stock';
+        updateStockFilterButtons();
+        displayedProducts = 0;
+        loadProducts();
+    });
+
+    showNoStockButton.addEventListener('click', () => {
+        stockFilter = 'no-stock';
+        updateStockFilterButtons();
+        displayedProducts = 0;
+        loadProducts();
     });
 
     loadMoreButton.addEventListener('click', loadMoreProducts);
+
+    reloadButton.addEventListener('click', () => {
+        location.reload();
+    });
+
+    document.getElementById('scroll-left').addEventListener('click', () => {
+        categoriesList.scrollBy({ left: -100, behavior: 'smooth' });
+    });
+
+    document.getElementById('scroll-right').addEventListener('click', () => {
+        categoriesList.scrollBy({ left: 100, behavior: 'smooth' });
+    });
 
     checkAuth();
     updateCartCount();
@@ -1834,7 +2105,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     cursor: pointer;
     z-index: 1000;
-    transition: background 0.2s;
+
 }
 
 .reload-button:hover {
